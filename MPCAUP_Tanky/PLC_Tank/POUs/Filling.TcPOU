@@ -19,70 +19,82 @@ END_VAR]]></Declaration>
       <ST><![CDATA[
 {region "REGION Aut/Man"}
 // Přepínání mezi režimy
-IF FillingPhase.Cmd.ManCtrl THEN
-    isManual := TRUE;
-    FillingPhase.State.ManCtrl := TRUE;
-    FillingPhase.State.AutCtrl := FALSE;
-ELSE
-    isManual := FALSE;
-    FillingPhase.State.ManCtrl := FALSE;
-    FillingPhase.State.AutCtrl := TRUE;
-END_IF;
+//IF FillingPhase.Cmd.ManCtrl THEN
+//    isManual := TRUE;
+//    FillingPhase.State.ManCtrl := TRUE;
+//    FillingPhase.State.AutCtrl := FALSE;
+//ELSE
+//    isManual := FALSE;
+//    FillingPhase.State.ManCtrl := FALSE;
+//    FillingPhase.State.AutCtrl := TRUE;
+//END_IF;
 {endregion}
 
 {region "ManCtrl"}
 // Manuální režim
-IF isManual THEN
-    IF FillingPhase.Cmd.StartMan THEN
-        FillingValve.Cmd.OpenMan := TRUE;
-        FillingPhase.State.Running := TRUE;
-        FillingPhase.Cmd.StartMan := FALSE;
-    END_IF;
+//IF isManual THEN
+//    IF FillingPhase.Cmd.StartMan THEN
+//        FillingValve.Cmd.OpenMan := TRUE;
+//        FillingPhase.State.Running := TRUE;
+//        FillingPhase.Cmd.StartMan := FALSE;
+//    END_IF;
 
-    IF FillingPhase.Cmd.StopMan OR FillingPhase.Cmd.PauseMan THEN
-        FillingValve.Cmd.CloseMan := TRUE;
-        FillingPhase.State.Running := FALSE;
-        FillingPhase.Cmd.StopMan := FALSE;
-        FillingPhase.Cmd.PauseMan := FALSE;
-    END_IF;
+//    IF FillingPhase.Cmd.StopMan OR FillingPhase.Cmd.PauseMan THEN
+//        FillingValve.Cmd.CloseMan := TRUE;
+//        FillingPhase.State.Running := FALSE;
+//        FillingPhase.Cmd.StopMan := FALSE;
+//        FillingPhase.Cmd.PauseMan := FALSE;
+//    END_IF;
 
-    IF FillingPhase.Cmd.ResumeMan THEN
-        FillingValve.Cmd.OpenMan := TRUE;
-        FillingPhase.State.Running := TRUE;
-        FillingPhase.Cmd.ResumeMan := FALSE;
-    END_IF;
-END_IF;
+//    IF FillingPhase.Cmd.ResumeMan THEN
+//        FillingValve.Cmd.OpenMan := TRUE;
+//        FillingPhase.State.Running := TRUE;
+//        FillingPhase.Cmd.ResumeMan := FALSE;
+//    END_IF;
+//END_IF;
 {endregion}
 
 {region "AutCtrl"}
+//Global.diValveFillOpen := TRUE;
+//Global.diValveFillClose := FALSE;
+	 
+		  
+			   
+{endregion}
 // Automatický režim
-IF NOT isManual THEN
-    IF FillingPhase.WaterLevel < FillingPhase.ParamFillLevel THEN
-        FillingValve.Cmd.Req2OpenAut := TRUE;
-        FillingValve.Cmd.Req2CloseAut := FALSE;
-        FillingPhase.State.Running := TRUE;
-    ELSE
-        FillingValve.Cmd.Req2OpenAut := FALSE;
-        FillingValve.Cmd.Req2CloseAut := TRUE;
-        FillingPhase.State.Running := FALSE;
-    END_IF;
-END_IF;
+//IF NOT isManual THEN
+//    IF FillingPhase.WaterLevel < FillingPhase.ParamFillLevel THEN
+//        FillingValve.Cmd.Req2OpenAut := TRUE;
+//        FillingValve.Cmd.Req2CloseAut := FALSE;
+//        FillingPhase.State.Running := TRUE;
+//    ELSE
+//        FillingValve.Cmd.Req2OpenAut := FALSE;
+//        FillingValve.Cmd.Req2CloseAut := TRUE;
+//        FillingPhase.State.Running := FALSE;
+//    END_IF;
+//END_IF;
 {endregion}
 
 {region "Done"}
 // Podmínka dokončení
-IF FillingPhase.WaterLevel >= FillingPhase.ParamFillLevel THEN
-    FillingPhase.State.Done := TRUE;
-    FillingPhase.State.Running := FALSE;
-    FillingValve.Cmd.Req2CloseAut := TRUE;
-END_IF;
+//IF FillingPhase.WaterLevel >= FillingPhase.ParamFillLevel THEN
+//    FillingPhase.State.Done := TRUE;
+//    FillingPhase.State.Running := FALSE;
+//    FillingValve.Cmd.Req2CloseAut := TRUE;
+//END_IF;
 {endregion}
 
 // Povolení fáze
-doEnabled := diEnabled;]]></ST>
+//doEnabled := diEnabled;]]></ST>
     </Implementation>
     <LineIds Name="Filling">
-      <LineId Id="527" Count="62" />
+      <LineId Id="527" Count="38" />
+      <LineId Id="608" Count="0" />
+      <LineId Id="605" Count="0" />
+      <LineId Id="604" Count="0" />
+      <LineId Id="606" Count="1" />
+      <LineId Id="603" Count="0" />
+      <LineId Id="566" Count="23" />
       <LineId Id="9" Count="0" />
     </LineIds>
   </POU>

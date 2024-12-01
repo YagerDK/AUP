@@ -14,25 +14,67 @@ VAR
 
     // Globální časový impuls
     secImp : BOOL;
+	
+	currentState : INT; // Aktuální stav automatu
+    nextState : INT;    // Následující stav
 
-    isManual : BOOL; // Manuální režim
+	
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// Generování časového impulsu
 Global.secImp := NOT(Global.secImp);
 
-// Nastavení režimu (příklad pro testování)
-isManual := TRUE; // Přepínání mezi manuálním a automatickým režimem
 
+// Stavový automat
+CASE currentState OF
+	0: // Stav 0 - Nic
+        
+            nextState := 1;
+       
+    1: // Stav 0 - Napouštění
+        // Kontrola, zda je tank naplněn
+        //IF tankFull THEN
+		fbFilling.diEnabled := TRUE;
+            //nextState := 1;
+        //END_IF;
 
+    2: // Stav 1 - Zahřívání
+        // Kontrola, zda je dosažena požadovaná teplota
+        //IF temperatureReached THEN
+            nextState := 2;
+        //END_IF;
 
-]]></ST>
+    3: // Stav 2 - Homogenizace (míchání při teplotě > 40 °C)
+        // Kontrola, zda uplynul požadovaný čas
+        //IF holdTimeElapsed THEN
+            nextState := 3;
+        //END_IF;
+
+    4: // Stav 3 - Odpouštění
+        // Proces odpouštění dokončen
+        //IF NOT tankFull THEN
+            nextState := 0; // Návrat do fáze napouštění
+        //END_IF;
+
+    ELSE
+        // Výchozí stav při chybě
+        nextState := 0;
+END_CASE;
+
+// Aktualizace aktuálního stavu
+currentState := nextState;]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
       <LineId Id="443" Count="0" />
       <LineId Id="441" Count="1" />
-      <LineId Id="432" Count="3" />
-      <LineId Id="459" Count="0" />
+      <LineId Id="478" Count="0" />
+      <LineId Id="524" Count="1" />
+      <LineId Id="557" Count="1" />
+      <LineId Id="560" Count="0" />
+      <LineId Id="556" Count="0" />
+      <LineId Id="526" Count="2" />
+      <LineId Id="561" Count="0" />
+      <LineId Id="529" Count="26" />
       <LineId Id="368" Count="0" />
     </LineIds>
   </POU>

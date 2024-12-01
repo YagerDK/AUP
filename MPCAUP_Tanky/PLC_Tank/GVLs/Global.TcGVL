@@ -26,6 +26,7 @@ VAR_GLOBAL
 	doValveDrainOpen : BOOL;
 	doValveDrainClose : BOOL;
 	doHeatingEnable : BOOL;
+	isManual : BOOL; // false = automatic, true = manual
 	
 	aoReqPowerOfHeating : WORD;
 
