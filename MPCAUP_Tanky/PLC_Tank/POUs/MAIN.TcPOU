@@ -24,17 +24,25 @@ END_VAR]]></Declaration>
       <ST><![CDATA[// Generování časového impulsu
 Global.secImp := NOT(Global.secImp);
 
-
+//Global.doValveFillOpen := TRUE;
+//Global.diValveFillOpen := TRUE;
+//Global.doValveFillClose := FALSE;
 // Stavový automat
 CASE currentState OF
 	0: // Stav 0 - Nic
-        
+         fillingPhase.ParamFillLevel := 10.0;
             nextState := 1;
        
     1: // Stav 0 - Napouštění
         // Kontrola, zda je tank naplněn
         //IF tankFull THEN
-		fbFilling.diEnabled := TRUE;
+		fbFilling(
+    diEnabled := TRUE,              // Vstupní parametr
+    doEnabled => ,                  // Výstupní parametr
+    FillingPhase := fillingPhase,   // IN_OUT parametr
+    FillingValve := fillingValve    // IN_OUT parametr
+);
+		
             //nextState := 1;
         //END_IF;
 
@@ -67,13 +75,16 @@ currentState := nextState;]]></ST>
     <LineIds Name="MAIN">
       <LineId Id="443" Count="0" />
       <LineId Id="441" Count="1" />
+      <LineId Id="563" Count="1" />
       <LineId Id="478" Count="0" />
       <LineId Id="524" Count="1" />
       <LineId Id="557" Count="1" />
       <LineId Id="560" Count="0" />
       <LineId Id="556" Count="0" />
       <LineId Id="526" Count="2" />
-      <LineId Id="561" Count="0" />
+      <LineId Id="568" Count="4" />
+      <LineId Id="565" Count="0" />
+      <LineId Id="562" Count="0" />
       <LineId Id="529" Count="26" />
       <LineId Id="368" Count="0" />
     </LineIds>
