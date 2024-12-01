@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <DUT Name="TPhaseHeating" Id="{25440770-ac65-42dd-8945-2dbb24707357}">
+    <Declaration><![CDATA[TYPE TPhaseHeating :
+STRUCT
+	Cmd : TPhaseCmd;
+	State : TPhaseState;
+	
+	ParamReqTemp : REAL;
+	
+	WaterTemp : REAL;
+	
+	fTime : INT;
+END_STRUCT
+END_TYPE
+
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

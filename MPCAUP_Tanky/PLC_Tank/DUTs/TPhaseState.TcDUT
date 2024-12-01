@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="TPhaseState" Id="{1f7837a4-05b0-46fd-b05a-8e6d79a64521}">
+    <Declaration><![CDATA[TYPE TPhaseState :
+STRUCT
+	Running : BOOL;
+	Idle : BOOL;
+	Paused : BOOL;
+	Done : BOOL;
+	AutCtrl : BOOL;
+	ManCtrl : BOOL;
+	Stateint : INT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

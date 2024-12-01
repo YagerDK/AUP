@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="Engine" Id="{0275025c-bb3c-47ed-8e27-8a98e5c5bc2f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Engine
+VAR_INPUT
+	iRunning : BOOL;
+	iError : BOOL;
+	iSecImp : BOOL;
+END_VAR
+VAR_OUTPUT
+	oRun : BOOL;
+END_VAR
+VAR_IN_OUT
+	Engine : TEngine;
+END_VAR
+VAR
+	RT : DINT;
+	SUF_TIMER : TON;
+	Stat_Bit : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[{region "Running time"}
+//counting running time of engine - (motoseconds in real situation it should be moto hours)
+//detection rising edge of input secimp - should be conected 1Hz internal clock from PLC
+
+	 
+		  
+SUF_TIMER(IN := iRunning, PT:= Engine.Time2Start);
+SUF_TIMER.Q;
+	 
+  {endregion}]]></ST>
+    </Implementation>
+    <LineIds Name="Engine">
+      <LineId Id="3" Count="8" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

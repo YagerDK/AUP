@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="TEngineState" Id="{58815402-e10d-4ddd-88eb-1b037485bca6}">
+    <Declaration><![CDATA[TYPE TEngineState :
+STRUCT
+		RT : DINT;
+		Run : BOOL;
+		RunOut : BOOL;
+		Err : BOOL;
+		StartUpFail : BOOL;
+		AutCtrl : BOOL;
+		ManCtrl : BOOL;
+		MayRun : BOOL;
+		MayAutoRun : BOOL;
+		GenErr : BOOL;
+		StateInt : INT;
+		
+		StartupFailTime : INT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

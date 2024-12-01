@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <POU Name="Filling" Id="{9d4dcb01-ad56-4326-9456-8cd473ff054e}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Filling
+VAR_INPUT
+    diEnabled : BOOL; // Aktivace fáze
+END_VAR
+VAR_OUTPUT
+    doEnabled : BOOL; // Výstupní povolení fáze
+END_VAR
+VAR_IN_OUT
+    FillingPhase : TPhaseFilling; // Struktura fáze napouštění
+    FillingValve : TValve;       // Struktura ventilu
+END_VAR
+VAR
+    isManual : BOOL; // Příznak manuálního režimu
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+{region "REGION Aut/Man"}
+// Přepínání mezi režimy
+IF FillingPhase.Cmd.ManCtrl THEN
+    isManual := TRUE;
+    FillingPhase.State.ManCtrl := TRUE;
+    FillingPhase.State.AutCtrl := FALSE;
+ELSE
+    isManual := FALSE;
+    FillingPhase.State.ManCtrl := FALSE;
+    FillingPhase.State.AutCtrl := TRUE;
+END_IF;
+{endregion}
+
+{region "ManCtrl"}
+// Manuální režim
+IF isManual THEN
+    IF FillingPhase.Cmd.StartMan THEN
+        FillingValve.Cmd.OpenMan := TRUE;
+        FillingPhase.State.Running := TRUE;
+        FillingPhase.Cmd.StartMan := FALSE;
+    END_IF;
+
+    IF FillingPhase.Cmd.StopMan OR FillingPhase.Cmd.PauseMan THEN
+        FillingValve.Cmd.CloseMan := TRUE;
+        FillingPhase.State.Running := FALSE;
+        FillingPhase.Cmd.StopMan := FALSE;
+        FillingPhase.Cmd.PauseMan := FALSE;
+    END_IF;
+
+    IF FillingPhase.Cmd.ResumeMan THEN
+        FillingValve.Cmd.OpenMan := TRUE;
+        FillingPhase.State.Running := TRUE;
+        FillingPhase.Cmd.ResumeMan := FALSE;
+    END_IF;
+END_IF;
+{endregion}
+
+{region "AutCtrl"}
+// Automatický režim
+IF NOT isManual THEN
+    IF FillingPhase.WaterLevel < FillingPhase.ParamFillLevel THEN
+        FillingValve.Cmd.Req2OpenAut := TRUE;
+        FillingValve.Cmd.Req2CloseAut := FALSE;
+        FillingPhase.State.Running := TRUE;
+    ELSE
+        FillingValve.Cmd.Req2OpenAut := FALSE;
+        FillingValve.Cmd.Req2CloseAut := TRUE;
+        FillingPhase.State.Running := FALSE;
+    END_IF;
+END_IF;
+{endregion}
+
+{region "Done"}
+// Podmínka dokončení
+IF FillingPhase.WaterLevel >= FillingPhase.ParamFillLevel THEN
+    FillingPhase.State.Done := TRUE;
+    FillingPhase.State.Running := FALSE;
+    FillingValve.Cmd.Req2CloseAut := TRUE;
+END_IF;
+{endregion}
+
+// Povolení fáze
+doEnabled := diEnabled;]]></ST>
+    </Implementation>
+    <LineIds Name="Filling">
+      <LineId Id="527" Count="62" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

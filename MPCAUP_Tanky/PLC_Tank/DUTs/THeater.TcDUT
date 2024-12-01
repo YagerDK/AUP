@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <DUT Name="THeater" Id="{8826be77-a6b6-43cc-aa6f-379076f46e7c}">
+    <Declaration><![CDATA[TYPE THeater :
+STRUCT
+	Cmd : THeaterCmd;
+	State : THeaterState;
+	
+	ParamHeatingPowerManual : REAL;
+	ParamHeatingSetPointAutomat : REAL;
+	
+	PID : FB_CTRL_PID;
+	ThresholdTimer : TON;
+	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

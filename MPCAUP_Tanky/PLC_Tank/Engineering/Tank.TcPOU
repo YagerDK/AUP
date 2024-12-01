@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="Tank" Id="{f84ad52f-e512-422e-be18-b265eb0ae589}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Tank
+VAR_INPUT
+	diMixer_Running : BOOL;
+	diMixer_Error : BOOL;
+END_VAR
+VAR_OUTPUT
+	doMixer_Start : BOOL;
+END_VAR
+VAR_IN_OUT
+	ioTank : TTank;
+END_VAR
+VAR
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Engine(iRunning:=diMixer_Running, iError:=diMixer_Error, Engine:=ioTank.Mixer);
+Engine.oRun:=doMixer_Start
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="Tank">
+      <LineId Id="17" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="20" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

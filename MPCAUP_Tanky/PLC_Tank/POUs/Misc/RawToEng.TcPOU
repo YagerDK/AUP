@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <POU Name="RawToEng" Id="{2bc2853a-1077-4f1d-a7fb-ade6d5b9212b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK RawToEng
+VAR_INPUT
+	iEnabled : BOOL;
+	wRawValue : WORD;
+	AnalogConversion : TAnalogConversion;
+END_VAR
+VAR_OUTPUT
+	oEnabled : BOOL;
+	fScaledValue : REAL;
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//Prepocet z wRawValue (z procesu po ModbusTCP) na fScaledValue (do PLC) podle parametru v AnalogConversion.
+
+//Filtrace hodnoty, bylo by vhodne odfiltrovat take kmitani z minimalniho rozsahu na maximalni hodnotu 27648
+IF wRawValue = 27648 THEN 
+	wRawValue := 0; //Ale lepe nez takto...
+END_IF
+
+fScaledValue:= (AnalogConversion.ScaledValHiLevel-AnalogConversion.ScaledValLoLevel) * (wRawValue-AnalogConversion.TransducerLoLevel)/(AnalogConversion.TransducerHiLevel-AnalogConversion.TransducerLoLevel) + AnalogConversion.ScaledValLoLevel;
+oEnabled := iEnabled;]]></ST>
+    </Implementation>
+    <LineIds Name="RawToEng">
+      <LineId Id="54" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="29" Count="2" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="16" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

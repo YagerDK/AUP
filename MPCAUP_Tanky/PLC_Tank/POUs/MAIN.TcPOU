@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <POU Name="MAIN" Id="{1ebefdd1-3e03-4aac-b0d7-9cb2e38b8084}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+    // Instance funkčního bloku Filling
+    fbFilling : Filling;
+
+    // Struktura fáze Filling
+    fillingPhase : TPhaseFilling;
+
+    // Struktura ventilu
+    fillingValve : TValve;
+
+    // Globální časový impuls
+    secImp : BOOL;
+
+    isManual : BOOL; // Manuální režim
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Generování časového impulsu
+Global.secImp := NOT(Global.secImp);
+
+// Nastavení režimu (příklad pro testování)
+isManual := TRUE; // Přepínání mezi manuálním a automatickým režimem
+
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="443" Count="0" />
+      <LineId Id="441" Count="1" />
+      <LineId Id="432" Count="3" />
+      <LineId Id="459" Count="0" />
+      <LineId Id="368" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

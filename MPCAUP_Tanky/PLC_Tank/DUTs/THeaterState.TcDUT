@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="THeaterState" Id="{d83d7e51-3b95-4d8a-aaac-7196e3c7e3d2}">
+    <Declaration><![CDATA[TYPE THeaterState :
+STRUCT
+	EnableOut : BOOL;
+	HeatingOut : REAL;
+	AutCtrl : BOOL;
+	ManCtrl : BOOL;
+	Err 	: BOOL;
+	StateInt : INT;
+	GenErr : BOOL; //signalisation: error occured
+
+	HeatingPower : REAL;
+	
+
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

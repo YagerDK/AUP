@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="TValveState" Id="{c2750294-6b32-4ed6-9961-81e91e985845}">
+    <Declaration><![CDATA[TYPE TValveState :
+STRUCT
+		Open : BOOL;
+		Closed : BOOL;
+		OpenOut : BOOL;
+		CloseOut : BOOL;
+		Err : BOOL;
+		StartupFail : BOOL;
+		AutCtrl : BOOL;
+		ManCtrl : BOOL;
+		MayRun : BOOL;
+		MayAutoRun : BOOL; //device is working in automatic regime
+		GenErr : BOOL; //signalisation: error occured
+		StColor : INT; //valve state: Open(0), Closed(1), OpenAndErr(2), ClosedAndErr(3) ,NotOpenNotClosedNotErr(4), NotOpenNotClosedAndErr(5), OpenAndClosedAndErr(6), OpenAndClosedNotErr(7)
+
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

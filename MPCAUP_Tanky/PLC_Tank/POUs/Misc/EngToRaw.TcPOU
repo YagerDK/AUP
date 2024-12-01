@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <POU Name="EngToRaw" Id="{c671cf82-59e0-434c-ac72-b75741f36d84}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK EngToRaw
+VAR_INPUT
+	iEnabled : BOOL;
+	fScaledValue : REAL;
+	AnalogConversion : TAnalogConversion;
+END_VAR
+VAR_OUTPUT
+	oEnabled : BOOL;
+	wRawValue : WORD;
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//Prepocet z fScaledValue (z PLC) na wRawValue (do procesu po ModbusTCP) podle parametru v AnalogConversion.
+wRawValue := REAL_TO_WORD((AnalogConversion.TransducerHiLevel - AnalogConversion.TransducerLoLevel) * (fScaledValue - AnalogConversion.ScaledValLoLevel) / (AnalogConversion.ScaledValHiLevel - AnalogConversion.ScaledValLoLevel) + AnalogConversion.TransducerLoLevel);
+oEnabled := iEnabled;]]></ST>
+    </Implementation>
+    <LineIds Name="EngToRaw">
+      <LineId Id="30" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="17" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

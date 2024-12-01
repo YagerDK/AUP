@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <POU Name="Draining" Id="{a501d01f-bc41-415b-8bb8-19a7a35d7bf8}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Draining
+VAR_INPUT
+	diEnabled : BOOL;
+END_VAR
+VAR_OUTPUT
+	doEnabled : BOOL;
+END_VAR
+VAR_IN_OUT
+	DrainingPhase : TPhaseDraining;
+	DrainingValve : TValve;
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[{region "Aut/Man"}
+    // switching state of engine - automatic or manual control (default state is manual)
+  
+{endregion}
+
+{region "ManCtrl"}
+    // processing manual actions - if command is processed, it is sets to FALSE even if can't be processed
+    // Phase commands are start, stop, pause and resume 
+    // Start - open draining valve 
+    // Stop - close draining valve
+    // Pause - close draining valve
+    // Resume - open draining valve
+    // real states of phase are writed into states in phase structure
+  
+{endregion}
+
+{region "AutCtrl"}
+    //if request to run in automatic mode -> set auto request to open of filling valve to 1 and close to 0, if not open 0 close 1
+    // commands should be sets to false after their processing
+   
+{endregion}
+{region "Done"}
+    //every phase should have finish condition - draining phase - if water level is below requested level
+    //after that done state should be setted to 1
+   
+{endregion}
+
+{region "States"} 
+    //Command valve in cases of states
+   
+{endregion}
+
+// delault state of phase - if not any state sets state to idle
+IF (NOT DrainingPhase.State.Idle) AND (NOT DrainingPhase.State.Paused) AND (NOT DrainingPhase.State.Running) THEN
+    DrainingPhase.State.Idle := 1;
+END_IF;
+
+// write binary states into int value for visualization
+IF DrainingPhase.State.Idle THEN
+    DrainingPhase.State.StateInt := Global.PhIdle;
+ELSIF DrainingPhase.State.Running THEN
+    DrainingPhase.State.StateInt := Global.PhRunning;
+ELSE
+    DrainingPhase.State.StateInt := Global.PhPause;
+END_IF;
+
+//Ponechte pro moznost retezeni volani bloku v LAD
+doEnabled := diEnabled;]]></ST>
+    </Implementation>
+    <LineIds Name="Draining">
+      <LineId Id="10" Count="1" />
+      <LineId Id="24" Count="10" />
+      <LineId Id="76" Count="5" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="97" Count="3" />
+      <LineId Id="112" Count="4" />
+      <LineId Id="123" Count="1" />
+      <LineId Id="126" Count="0" />
+      <LineId Id="154" Count="11" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="153" Count="0" />
+      <LineId Id="139" Count="0" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

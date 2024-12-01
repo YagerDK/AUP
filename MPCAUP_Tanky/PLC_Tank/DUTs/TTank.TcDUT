@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <DUT Name="TTank" Id="{8ca78818-1b53-487b-b198-f81c31206d49}">
+    <Declaration><![CDATA[TYPE TTank :
+STRUCT
+	Mixer : TEngine;
+	ValveFilling : TValve;
+	ValveDraining : TValve;
+	Heater : THeater;
+	
+	Filling : TPhaseFilling;
+	Draining : TPhaseDraining;
+	Mixing : TPhaseMixing;
+	Heating : TPhaseHeating;
+	
+	GlobalError : BOOL;
+
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

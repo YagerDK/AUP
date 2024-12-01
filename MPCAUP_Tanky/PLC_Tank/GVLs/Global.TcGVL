@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <GVL Name="Global" Id="{333ab731-f1f8-4c18-9703-80341d0d7a94}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	Tank1 : TTank;
+	
+
+	secImp : BOOL;
+	
+	diMixerRun : BOOL;
+	diMixerError : BOOL;
+	diValveFillOpen : BOOL;
+	diValveFillClose : BOOL;
+	diValveFillError : BOOL;
+	diValveDrainOpen : BOOL;
+	diValveDrainClose : BOOL;
+	diValveDrainError : BOOL;
+	
+	aiWaterLevel : WORD;
+	aiWaterTemp : WORD;
+	
+	doMixerStart : BOOL;
+	doValveFillOpen : BOOL;
+	doValveFillClose : BOOL;
+	doValveDrainOpen : BOOL;
+	doValveDrainClose : BOOL;
+	doHeatingEnable : BOOL;
+	
+	aoReqPowerOfHeating : WORD;
+
+END_VAR
+
+VAR_GLOBAL CONSTANT
+	Running : INT := 0;
+	Stop : INT := 1;
+	RunningAndError : INT := 2;
+	Err : INT := 3;
+
+	PhIdle : INT := 0;
+	PhRunning : INT := 1;
+	PhPause : INT := 2;
+	
+    Open : INT := 0;
+	Closed : INT := 1;
+	OpenAndErr : INT := 2;
+	ClosedAndErr : INT := 3;
+	NotOpenNotClosedNotErr : INT := 4;
+	NotOpenNotClosedAndErr : INT := 5;
+	OpenAndClosedAndErr : INT := 6;
+	OpenAndClosedNotErr : INT := 7;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

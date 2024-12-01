@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="Test" Id="{b48fe353-a43c-460a-bd31-5cbc20fa1301}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Test
+VAR
+	State : INT := 0;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE State OF
+	1:  Global.Tank1.Filling.ParamFillLevel := 1.8;
+		Global.Tank1.Filling.Cmd.ManCtrl := TRUE;
+		Global.Tank1.Filling.Cmd.StartMan:= TRUE;
+		IF Global.Tank1.Filling.State.Done = TRUE THEN
+			State := 2;
+		END_IF
+	2: //...
+END_CASE
+]]></ST>
+    </Implementation>
+    <LineIds Name="Test">
+      <LineId Id="9" Count="1" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="16" Count="2" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

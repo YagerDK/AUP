@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.62">
+	<Project ProjectGUID="{6AF5D0C0-9E5E-46F6-B933-497A746FB724}" Target64Bit="true" ShowHideConfigurations="#x6">
+		<System>
+			<Settings MaxCpus="4" NonWinCpus="1" RouterMemory="31457280">
+				<Cpu CpuId="3"/>
+			</Settings>
+			<Licenses>
+				<Target>
+					<ManualSelect>{68A05D95-13CD-491E-A0DD-DC396DC90A19}</ManualSelect>
+					<ManualSelect>{DEA72F0A-9EA0-48F4-ABB5-766516202B8E}</ManualSelect>
+					<ManualSelect>{6952449D-F68C-49A2-ADE4-8639D85B33A4}</ManualSelect>
+					<ManualSelect>{D8A1885F-B127-4B81-A1D3-D1D70C8D79A7}</ManualSelect>
+				</Target>
+			</Licenses>
+			<Tasks>
+				<Task Id="3" Priority="20" CycleTime="1000000" AmsPort="350" AdtTasks="true">
+					<Name>PlcTask</Name>
+				</Task>
+				<Task Id="4" Priority="1" CycleTime="5000000" AmsPort="351" AdtTasks="true">
+					<Name>PlcTask500ms</Name>
+				</Task>
+			</Tasks>
+			<AdditionalProjectFiles>
+				<File>_AML\Project.aml</File>
+				<File>_AML\TwinCAT.AMLDataExchange.log</File>
+			</AdditionalProjectFiles>
+		</System>
+		<Plc>
+			<Project GUID="{E24257DA-2A8A-49A0-98A5-1F7251912541}" Name="PLC_Tank" PrjFilePath="PLC_Tank\PLC_Tank.plcproj" TmcFilePath="PLC_Tank\PLC_Tank.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="PLC_Tank\PLC_Tank.tmc" TmcHash="{B0D8625D-DE41-5225-88BE-511D87ADA364}">
+					<Name>PLC_Tank Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<Contexts>
+						<Context>
+							<Id>0</Id>
+							<Name>PlcTask500ms</Name>
+							<ManualConfig>
+								<OTCID>#x02010040</OTCID>
+							</ManualConfig>
+							<Priority>1</Priority>
+							<CycleTime>500000000</CycleTime>
+						</Context>
+						<Context>
+							<Id>1</Id>
+							<Name>PlcTask</Name>
+							<ManualConfig>
+								<OTCID>#x02010030</OTCID>
+							</ManualConfig>
+							<Priority>20</Priority>
+							<CycleTime>100000000</CycleTime>
+						</Context>
+					</Contexts>
+					<TaskPouOids>
+						<TaskPouOid Prio="1" OTCID="#x08502001"/>
+						<TaskPouOid Prio="20" OTCID="#x08502002"/>
+					</TaskPouOids>
+				</Instance>
+			</Project>
+		</Plc>
+	</Project>
+</TcSmProject>

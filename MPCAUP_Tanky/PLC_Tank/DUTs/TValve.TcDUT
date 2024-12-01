@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <DUT Name="TValve" Id="{c769af80-eeba-4af4-9934-db9b2e751452}">
+    <Declaration><![CDATA[TYPE TValve :
+STRUCT
+	Cmd : TValveCmd;
+	State : TValveState;
+	Time2Open : TIME := T#12S;
+	
+	OpenFailTimer : TON;
+	CloseFailTimer : TON;
+	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

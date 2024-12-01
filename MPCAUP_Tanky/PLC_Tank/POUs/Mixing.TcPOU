@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <POU Name="Mixing" Id="{c7d77201-326e-43f5-84be-5e5d3f37b70d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Mixing
+VAR_INPUT
+	diEnabled : BOOL;
+	iSecImp : BOOL;
+END_VAR
+VAR_OUTPUT
+	doEnabled : BOOL;
+END_VAR
+VAR_IN_OUT
+	MixingPhase : TPhaseMixing;
+	MixerEng : TEngine;
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[{region "Aut/Man"}
+    // switching state of engine - automatic or manual control (default state is manual)
+  
+{endregion}
+
+{region "ManCtrl"}
+    // processing manual actions - if command is processed, it is sets to FALSE even if can't be processed
+    // Phase commands are start, stop, pause and resume 
+    // Start - start mixing  
+    // Stop - stop mixing
+    // Pause - stop mixing 
+    // Resume - start mixing
+    // real states of phase are writed into states in phase structure
+   
+{endregion}
+
+{region "AutCtrl"}
+    // if request to run in automatic mode -> set auto request to mixing to 1, if not request to mixing is 0
+    // commands should be sets to false after their processing
+   
+{endregion}
+
+{region "Done"}
+    // every phase should have finish condition - mixing phase - if time of runnig is bigger or same as requested
+    // after that done state should be setted to 1
+ 
+{endregion}
+
+{region "States"}
+    //Command mixer in cases of states
+
+{endregion}
+ MixingPhase.State.Running := TRUE;
+
+// delault state of phase - if not any state sets state to idle
+IF NOT MixingPhase.State.Idle AND NOT MixingPhase.State.Done AND NOT MixingPhase.State.Paused AND NOT MixingPhase.State.Running THEN
+    MixingPhase.State.Idle := 1;
+END_IF;
+
+
+// delault state of phase - if not any state sets state to idle
+IF MixingPhase.State.Idle THEN
+    MixingPhase.State.StateInt := Global.PhIdle;
+ELSIF MixingPhase.State.Running THEN
+    MixingPhase.State.StateInt := Global.PhRunning;
+ELSE
+    MixingPhase.State.StateInt := Global.PhPause;
+END_IF;
+
+doEnabled := diEnabled;
+]]></ST>
+    </Implementation>
+    <LineIds Name="Mixing">
+      <LineId Id="10" Count="1" />
+      <LineId Id="24" Count="10" />
+      <LineId Id="78" Count="5" />
+      <LineId Id="99" Count="1" />
+      <LineId Id="103" Count="3" />
+      <LineId Id="123" Count="4" />
+      <LineId Id="132" Count="18" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="166" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

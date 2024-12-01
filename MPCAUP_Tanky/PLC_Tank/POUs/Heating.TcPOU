@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <POU Name="Heating" Id="{67bfd793-3f9c-4f6b-ac3b-8ac7d5e1f5d7}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Heating
+VAR_INPUT
+	diEnabled : BOOL;
+	iSecImp : BOOL;
+END_VAR
+VAR_OUTPUT
+	doEnabled : BOOL;
+END_VAR
+VAR_IN_OUT
+	HeatingPhase : TPhaseHeating;
+	Heater : THeater;
+END_VAR
+VAR
+	pidParameters : ST_CTRL_PID_PARAMS;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[{region "Aut/Man"}
+    // switching state of engine - automatic or manual control (default state is manual)
+ 
+{endregion}
+
+{region "ManCtrl"}
+    // processing manual actions - if command is processed, it is sets to FALSE even if can't be processed
+        // real states of phase are writed into states in phase structure
+    
+   
+{endregion}
+
+{region "AutCtrl"}
+    // if request to run in automatic mode -> set auto request to heat to 1, if not request to heat 0
+    // commands should be sets to false after their processing
+  
+{endregion}
+
+{region "Done"}
+    //every phase should have finish condition - heating phase - if water temp is on requested value for 15 seconds with 1°C hysteresis
+    //after that done state should be setted to 1
+
+
+
+    // command reset done resets done state and than resets command
+  
+{endregion}
+
+{region "States"}
+    //Command valve in cases of states
+    // Running - start heating  
+    // Idle - stop heating
+    // Pause - stop heating (alternative is hold actual temp)
+  
+{endregion}
+
+// delault state of phase - if not any state sets state to idle
+IF NOT HeatingPhase.State.Idle AND NOT HeatingPhase.State.Paused AND NOT HeatingPhase.State.Running THEN
+    HeatingPhase.State.Idle := 1;
+END_IF;
+
+doEnabled := diEnabled;]]></ST>
+    </Implementation>
+    <LineIds Name="Heating">
+      <LineId Id="72" Count="1" />
+      <LineId Id="86" Count="6" />
+      <LineId Id="122" Count="5" />
+      <LineId Id="141" Count="5" />
+      <LineId Id="224" Count="0" />
+      <LineId Id="275" Count="2" />
+      <LineId Id="170" Count="7" />
+      <LineId Id="183" Count="3" />
+      <LineId Id="281" Count="1" />
+      <LineId Id="189" Count="0" />
+      <LineId Id="204" Count="0" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="TPhaseCmd" Id="{2aa1d9b2-effd-48a9-b3e4-45597be97ed8}">
+    <Declaration><![CDATA[TYPE TPhaseCmd :
+STRUCT
+	StartAut : BOOL;
+	StopAut : BOOL;
+	StartMan : BOOL;
+	StopMan : BOOL;
+	PauseMan : BOOL;
+	ResumeMan : BOOL;
+	ResetDone : BOOL;
+	AutCtrl : BOOL;
+	ManCtrl : BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

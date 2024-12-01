@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="THeaterCmd" Id="{368dc252-782c-4340-9056-832559624b97}">
+    <Declaration><![CDATA[TYPE THeaterCmd :
+STRUCT
+	AutCtrl : BOOL;
+	ManCtrl : BOOL;
+	TurnOnMan : BOOL;
+	TurnOffMan : BOOL;
+	Req2RunAutCtrl : BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

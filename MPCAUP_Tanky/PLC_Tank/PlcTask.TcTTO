@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <Task Name="PlcTask" Id="{a39e375f-8f79-483a-b63b-ca9720662e70}">
+    <!--CycleTime in micro seconds.-->
+    <CycleTime>100000</CycleTime>
+    <Priority>20</Priority>
+    <PouCall>
+      <Name>MB_Connector</Name>
+    </PouCall>
+    <PouCall>
+      <Name>Main_Batch</Name>
+    </PouCall>
+    <TaskFBGuid>{5eebdd6d-4e52-4986-8322-568bf1f8cdb2}</TaskFBGuid>
+    <Fb_init>{25bd93a4-1892-4183-b597-0ed6f781bc94}</Fb_init>
+    <Fb_exit>{fb7cf8b6-5192-4d50-bcb0-65b776277df7}</Fb_exit>
+    <CycleUpdate>{3cf8ae66-ad6d-4e73-b093-91136ec0decf}</CycleUpdate>
+    <PostCycleUpdate>{e58fb2f5-51c6-4a51-bab0-7fa780275928}</PostCycleUpdate>
+  </Task>
+</TcPlcObject>

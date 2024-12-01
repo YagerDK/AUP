@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="TEngineCmd" Id="{a181e3ef-59d9-4703-bb6c-73c44b5460e7}">
+    <Declaration><![CDATA[TYPE TEngineCmd :
+STRUCT
+		SetRT : DINT;
+		AutCtrl : BOOL;
+		ManCtrl : BOOL;
+		TurnOnMan : BOOL;
+		TurnOffMan : BOOL;
+		Req2RunAutCtrl : BOOL;
+		ResetSUF : BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

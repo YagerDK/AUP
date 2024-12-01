@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <POU Name="Heater" Id="{fe81cd62-8fb3-4eb5-8579-8abf8e5327d3}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Heater
+VAR_INPUT
+	iWaterTemp : REAL;
+END_VAR
+VAR_OUTPUT
+	oHeaterEnable : BOOL;
+	oHeaterPower : REAL;
+END_VAR
+VAR_IN_OUT
+	ioHeatStruct : THeater;
+END_VAR
+VAR
+	pidParameters : ST_CTRL_PID_PARAMS;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[pidParameters.fKp := 10; //P
+pidParameters.tTn := T#2S; //I
+pidParameters.tTv := T#0.5S; //D
+pidParameters.tCtrlCycleTime := T#200MS;
+pidParameters.tTaskCycleTime := T#100MS;
+pidParameters.fOutMaxLimit := 100;
+pidParameters.fOutMinLimit := 0;
+pidParameters.bDInTheFeedbackPath := FALSE;
+pidParameters.bPInTheFeedbackPath := FALSE;
+pidParameters.bARWOnIPartOnly := FALSE;
+pidParameters.tTd := T#100MS; 
+
+ioHeatStruct.PID(
+	fSetpointValue := ioHeatStruct.ParamHeatingSetPointAutomat, 
+	fActualValue := iWaterTemp, 
+	fManSyncValue := ioHeatStruct.ParamHeatingPowerManual,
+	bSync := ioHeatStruct.State.ManCtrl,
+	eMode := E_CTRL_MODE.eCTRL_MODE_ACTIVE, // automatic mode of PID component
+	stParams := pidParameters);
+
+ioHeatStruct.State.HeatingOut := ioHeatStruct.PID.fOut;
+
+	 
+{region "Manual/Automat"}
+// switching state of engine - automatic or manual control (default state is manual)
+
+{endregion}
+	 
+ 
+{region "ManCtrl"}
+// processing manual actions - if command is processed, it is set to FALSE even if can't be processed
+// Engine commands are turn off (stop) and turn on (start)
+
+{endregion}
+ 
+{region "AutCtrl"}
+//if request to run in automatic mode set outputs to right states if MAR
+//AutoRequest shouldn't be reseted to false state
+
+{endregion}
+ 
+{region "Error states"}
+// if water temperature is too high, stop heating and generate error
+
+{endregion}
+	 
+ 
+oHeaterPower := ioHeatStruct.State.HeatingOut;
+oHeaterEnable := ioHeatStruct.State.EnableOut;]]></ST>
+    </Implementation>
+    <LineIds Name="Heater">
+      <LineId Id="382" Count="1" />
+      <LineId Id="372" Count="0" />
+      <LineId Id="385" Count="0" />
+      <LineId Id="387" Count="0" />
+      <LineId Id="386" Count="0" />
+      <LineId Id="388" Count="4" />
+      <LineId Id="384" Count="0" />
+      <LineId Id="370" Count="0" />
+      <LineId Id="374" Count="0" />
+      <LineId Id="373" Count="0" />
+      <LineId Id="375" Count="2" />
+      <LineId Id="380" Count="0" />
+      <LineId Id="394" Count="0" />
+      <LineId Id="393" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="321" Count="0" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="126" Count="0" />
+      <LineId Id="159" Count="1" />
+      <LineId Id="337" Count="1" />
+      <LineId Id="180" Count="0" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="190" Count="1" />
+      <LineId Id="349" Count="1" />
+      <LineId Id="201" Count="0" />
+      <LineId Id="192" Count="0" />
+      <LineId Id="202" Count="1" />
+      <LineId Id="354" Count="0" />
+      <LineId Id="436" Count="0" />
+      <LineId Id="204" Count="0" />
+      <LineId Id="434" Count="0" />
+      <LineId Id="256" Count="0" />
+      <LineId Id="358" Count="0" />
+      <LineId Id="260" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

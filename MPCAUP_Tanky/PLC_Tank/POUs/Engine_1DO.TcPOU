@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <POU Name="Engine_1DO" Id="{09f1d056-13ec-4f90-a65d-afcf9d2cd229}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Engine_1DO
+VAR_INPUT
+	iRunning : BOOL;
+	iError : BOOL;
+	iSecImp : BOOL;
+END_VAR
+VAR_OUTPUT
+	oRun : BOOL;
+END_VAR
+VAR_IN_OUT
+	ioEngStruct : TEngine;
+END_VAR
+VAR
+	secImpEdge: BOOL;
+	tempStartupFail: BOOL;
+END_VAR
+
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[{region "RunState"}
+    // set real state of engine run into engine structure
+  
+{endregion}
+
+{region "Running time"} 
+    // counting running time of engine - (motoseconds in real situation it should be moto hours)
+    // detection rising edge of input secimp - should be conected 1Hz internal clock from PLC
+	
+{endregion}
+	 
+ 
+{region "Manual/Automat"}
+	// switching state of engine - automatic or manual control (default state is manual)
+	
+{endregion}
+	 
+{region "MayRun / MayAutoRun"}
+	// setting auxilary signals (may run, may auto run) - MR AND NOT MAR - eng should be started in manual mode,
+    // MAR - should be started in automatic mode
+    ioEngStruct.State.MayRun := (ioEngStruct.State.ManCtrl AND NOT(ioEngStruct.State.GenErr));
+	ioEngStruct.State.MayAutoRun := (ioEngStruct.State.AutCtrl AND NOT(ioEngStruct.State.GenErr));
+		 
+			  
+{endregion}
+	 
+{region "ManCtrl"}
+	// processing manual actions - if command is processed, it is set to FALSE even if can't be processed
+    // Engine commands are turn off (stop) and turn on (start)
+	
+{endregion}
+	 
+{region "AutCtrl"}
+	//if request to run in automatic mode set outputs to right states if MAR
+    //AutoRequest shouldn't be reseted to false state
+    
+{endregion}
+	 
+{region "Error states"}
+	// definition of error states 
+	// error - input from digital input of plc - fyzical state of engine 
+	// calculating start up fail - if output is sets to start engine, it's expected feedback from running signal in defined time, if feedback doesn't show in this time, it should be start up fail error
+	// merge of these two error is general error
+	
+{endregion}
+	 
+oRun := ioEngStruct.State.RunOut;
+
+{region "StatusInt"}
+ IF NOT ioEngStruct.State.GenErr THEN
+        IF ioEngStruct.State.Run THEN
+            ioEngStruct.State.StateInt := Global.Running;
+        ELSE
+            ioEngStruct.State.StateInt := Global.Stop;
+        END_IF;
+    ELSE
+        IF ioEngStruct.State.Run THEN
+            ioEngStruct.State.StateInt := Global.RunningAndError;
+        ELSE
+            ioEngStruct.State.StateInt := Global.Err;
+        END_IF;
+    END_IF; 
+{endregion}]]></ST>
+    </Implementation>
+    <LineIds Name="Engine_1DO">
+      <LineId Id="367" Count="2" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="371" Count="0" />
+      <LineId Id="370" Count="0" />
+      <LineId Id="45" Count="1" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="366" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="126" Count="1" />
+      <LineId Id="130" Count="2" />
+      <LineId Id="144" Count="0" />
+      <LineId Id="276" Count="1" />
+      <LineId Id="128" Count="0" />
+      <LineId Id="159" Count="1" />
+      <LineId Id="164" Count="1" />
+      <LineId Id="180" Count="0" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="190" Count="1" />
+      <LineId Id="194" Count="1" />
+      <LineId Id="201" Count="0" />
+      <LineId Id="192" Count="0" />
+      <LineId Id="202" Count="1" />
+      <LineId Id="206" Count="3" />
+      <LineId Id="205" Count="0" />
+      <LineId Id="204" Count="0" />
+      <LineId Id="256" Count="0" />
+      <LineId Id="280" Count="1" />
+      <LineId Id="259" Count="0" />
+      <LineId Id="390" Count="11" />
+      <LineId Id="262" Count="0" />
+      <LineId Id="260" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

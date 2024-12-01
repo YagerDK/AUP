@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <POU Name="MB_Connector" Id="{53df711c-90f0-440b-86cd-6bc0d8c9b69a}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MB_Connector
+VAR
+	
+	mb_ipaddr   : STRING(15) := '127.0.0.1';
+	mb_port		: UINT := 503;
+	mb_unitid	: BYTE := 1;
+	
+	fbReadRegs		: FB_MBReadInputRegs;
+	mb_regs    		: ARRAY [0..4] OF WORD;
+	mb_regs_error	: BOOL;
+	mb_regs_busy	: BOOL;
+	mb_regs_execute : BOOL;
+	mb_regs_errid	: UDINT;
+	
+	fbReadInps	: FB_MBReadInputs;
+	mb_inps			: ARRAY [0..4] OF BYTE;
+	mb_inps_error	: BOOL;
+	mb_inps_busy	: BOOL;
+	mb_inps_execute : BOOL;
+	mb_inps_errid	: UDINT;
+	
+	fbWriteRegs		: FB_MBWriteRegs;
+	mbw_regs    	: ARRAY [0..4] OF WORD;
+	mbw_regs_error	: BOOL;
+	mbw_regs_busy	: BOOL;
+	mbw_regs_execute: BOOL;
+	mbw_regs_errid	: UDINT;
+	
+	fbWriteCoils	: FB_MBWriteCoils;
+	mbw_coils		: ARRAY [0..4] OF BYTE;
+	mbw_coils_error	: BOOL;
+	mbw_coils_busy	: BOOL;
+	mbw_coils_execute: BOOL;
+	mbw_coils_errid	: UDINT;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbReadRegs.sIPAddr := mb_ipaddr;
+fbReadRegs.nTCPPort := mb_port;
+fbReadRegs.nQuantity := 4;
+fbReadRegs.nMBAddr := 0;
+fbReadRegs.cbLength := SIZEOF(mb_regs);
+fbReadRegs.pDestAddr := ADR(mb_regs);
+fbReadRegs.nUnitID := mb_unitid;
+fbReadRegs.tTimeout := T#5S;
+IF (mb_regs_busy = FALSE) THEN
+	mb_regs_execute := TRUE;
+ELSE
+	mb_regs_execute := FALSE;
+END_IF
+fbReadRegs(bExecute := mb_regs_execute, 
+		   bBusy => mb_regs_busy, bError => mb_regs_error, 
+		   nErrId => mb_regs_errid);
+
+
+
+fbReadInps.sIPAddr := mb_ipaddr;
+fbReadInps.nTCPPort := mb_port;
+fbReadInps.nQuantity := 32;
+fbReadInps.nMBAddr := 0;
+fbReadInps.cbLength := SIZEOF(mb_inps);
+fbReadInps.pDestAddr := ADR(mb_inps);
+fbReadInps.nUnitID := mb_unitid;
+fbReadInps.tTimeout := T#5S;
+IF (mb_inps_busy = FALSE) THEN
+	mb_inps_execute := TRUE;
+ELSE
+	mb_inps_execute := FALSE;
+END_IF
+fbReadInps(bExecute := mb_inps_execute, 
+	bBusy => mb_inps_busy, bError => mb_inps_error, nErrId => mb_inps_errid);
+
+Global.diValveFillOpen := mb_inps[0].0;
+Global.diValveFillClose := mb_inps[0].1;
+Global.diValveFillError := mb_inps[0].2;
+Global.diValveDrainOpen := mb_inps[0].3;
+Global.diValveDrainClose := mb_inps[0].4;
+Global.diValveDrainError := mb_inps[0].5;
+Global.diMixerRun := mb_inps[0].6;
+Global.diMixerError := mb_inps[0].7;
+
+Global.aiWaterLevel := mb_regs[0];
+Global.aiWaterTemp := mb_regs[2];
+
+
+
+
+
+
+
+fbWriteRegs.sIPAddr := mb_ipaddr;
+fbWriteRegs.nTCPPort := mb_port;
+fbWriteRegs.nQuantity := 4;
+fbWriteRegs.nMBAddr := 0;
+fbWriteRegs.cbLength := SIZEOF(mbw_regs);
+fbWriteRegs.pSrcAddr := ADR(mbw_regs);
+fbWriteRegs.nUnitID := mb_unitid;
+fbWriteRegs.tTimeout := T#5S;
+IF (mbw_regs_busy = FALSE) THEN
+	mbw_regs_execute := TRUE;
+ELSE
+	mbw_regs_execute := FALSE;
+END_IF
+fbWriteRegs(bExecute := mbw_regs_execute, 
+		   bBusy => mbw_regs_busy, bError => mbw_regs_error, 
+		   nErrId => mbw_regs_errid);
+
+
+
+fbWriteCoils.sIPAddr := mb_ipaddr;
+fbWriteCoils.nTCPPort := mb_port;
+fbWriteCoils.nQuantity := 32;
+fbWriteCoils.nMBAddr := 0;
+fbWriteCoils.cbLength := SIZEOF(mbw_coils);
+fbWriteCoils.pSrcAddr := ADR(mbw_coils);
+fbWriteCoils.nUnitID := mb_unitid;
+fbWriteCoils.tTimeout := T#5S;
+IF (mbw_coils_busy = FALSE) THEN
+	mbw_coils_execute := TRUE;
+ELSE
+	mbw_coils_execute := FALSE;
+END_IF
+fbWriteCoils(bExecute := mbw_coils_execute, 
+	bBusy => mbw_coils_busy, bError => mbw_coils_error, nErrId => mbw_coils_errid);
+
+mbw_coils[0].0 := Global.doValveFillOpen;
+mbw_coils[0].1 := Global.doValveFillClose;
+mbw_coils[0].2 := Global.doValveDrainOpen;
+mbw_coils[0].3 := Global.doValveDrainClose;
+mbw_coils[0].4 := Global.doMixerStart;
+mbw_coils[0].5 := Global.doHeatingEnable;
+
+mbw_regs[0] := Global.aoReqPowerOfHeating;
+]]></ST>
+    </Implementation>
+    <LineIds Name="MB_Connector">
+      <LineId Id="26" Count="7" />
+      <LineId Id="35" Count="4" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="42" Count="8" />
+      <LineId Id="52" Count="4" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="139" Count="0" />
+      <LineId Id="222" Count="9" />
+      <LineId Id="173" Count="0" />
+      <LineId Id="233" Count="40" />
+      <LineId Id="285" Count="0" />
+      <LineId Id="274" Count="0" />
+      <LineId Id="288" Count="4" />
+      <LineId Id="295" Count="0" />
+      <LineId Id="294" Count="0" />
+      <LineId Id="232" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
