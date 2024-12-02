@@ -44,7 +44,7 @@ fbDO.iSecImp := Global.secImp; // Sekundový impuls
 
 fbDO(
     iOpen := scaledWaterLevel < FillingPhase.ParamFillLevel,
-    iClose := scaledWaterLevel >= FillingPhase.ParamFillLevel,
+    iClose := FALSE, // scaledWaterLevel >= FillingPhase.ParamFillLevel,
     //iError := Global.diValveError,
     iSecImp := Global.secImp,
     ioValStruct := FillingValve // Přiřazení VAR_IN_OUT parametru
@@ -65,7 +65,9 @@ doEnabled := diEnabled;
 ]]></ST>
     </Implementation>
     <LineIds Name="Filling">
-      <LineId Id="696" Count="22" />
+      <LineId Id="696" Count="14" />
+      <LineId Id="772" Count="0" />
+      <LineId Id="712" Count="6" />
       <LineId Id="749" Count="5" />
       <LineId Id="719" Count="13" />
       <LineId Id="9" Count="0" />
