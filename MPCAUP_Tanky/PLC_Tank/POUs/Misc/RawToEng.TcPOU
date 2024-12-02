@@ -3,35 +3,58 @@
   <POU Name="RawToEng" Id="{2bc2853a-1077-4f1d-a7fb-ade6d5b9212b}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK RawToEng
 VAR_INPUT
-	iEnabled : BOOL;
-	wRawValue : WORD;
-	AnalogConversion : TAnalogConversion;
+    iEnabled : BOOL;                  // Aktivace funkčního bloku
+    wRawValue : WORD;                 // Vstupní hrubá hodnota
+    AnalogConversion : TAnalogConversion; // Parametry převodu
 END_VAR
 VAR_OUTPUT
-	oEnabled : BOOL;
-	fScaledValue : REAL;
+    oEnabled : BOOL;                  // Stav funkčního bloku
+    fScaledValue : REAL;              // Výstupní škálovaná hodnota
 END_VAR
 VAR
-END_VAR
-]]></Declaration>
+    maxRawValue : WORD := 0;          // Maximální hodnota během intervalu
+    intervalCounter : UINT := 0;      // Počítadlo pro časový interval
+    intervalLimit : UINT := 4;       // Délka intervalu (např. 10 cyklů)
+    correctedRawValue : REAL;         // Opravená hodnota senzoru
+END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[//Prepocet z wRawValue (z procesu po ModbusTCP) na fScaledValue (do PLC) podle parametru v AnalogConversion.
+      <ST><![CDATA[
 
-//Filtrace hodnoty, bylo by vhodne odfiltrovat take kmitani z minimalniho rozsahu na maximalni hodnotu 27648
-IF wRawValue = 27648 THEN 
-	wRawValue := 0; //Ale lepe nez takto...
-END_IF
+// Úprava hodnoty na základě rozsahu
+IF wRawValue >= 27200 THEN
+    correctedRawValue := 0.0; // Hodnoty nad 27200 odpovídají 0 metrů
+ELSE
+    // Lineární přepočet pro hodnoty 0–27200 na rozsah 0–2 metry
+    correctedRawValue := wRawValue * (AnalogConversion.ScaledValHiLevel / 27200.0);
+END_IF;
 
-fScaledValue:= (AnalogConversion.ScaledValHiLevel-AnalogConversion.ScaledValLoLevel) * (wRawValue-AnalogConversion.TransducerLoLevel)/(AnalogConversion.TransducerHiLevel-AnalogConversion.TransducerLoLevel) + AnalogConversion.ScaledValLoLevel;
-oEnabled := iEnabled;]]></ST>
+// Detekce maxima během intervalu
+IF correctedRawValue > maxRawValue THEN
+    maxRawValue := wRawValue; // Aktualizace maximální hodnoty
+END_IF;
+
+// Zvýšení počítadla intervalu
+intervalCounter := intervalCounter + 1;
+
+// Konec intervalu: Přepočet maximální hodnoty
+IF intervalCounter >= intervalLimit THEN
+    // Přepočet na škálovanou hodnotu
+    fScaledValue := (AnalogConversion.ScaledValHiLevel - AnalogConversion.ScaledValLoLevel) *
+                    (maxRawValue - AnalogConversion.TransducerLoLevel) /
+                    (AnalogConversion.TransducerHiLevel - AnalogConversion.TransducerLoLevel) +
+                    AnalogConversion.ScaledValLoLevel;
+
+    // Reset intervalu
+    maxRawValue := 0;      // Reset maximální hodnoty
+    intervalCounter := 0;  // Reset počítadla
+END_IF;
+
+// Nastavení výstupu
+oEnabled := iEnabled;
+]]></ST>
     </Implementation>
     <LineIds Name="RawToEng">
-      <LineId Id="54" Count="0" />
-      <LineId Id="56" Count="0" />
-      <LineId Id="55" Count="0" />
-      <LineId Id="29" Count="2" />
-      <LineId Id="51" Count="0" />
-      <LineId Id="9" Count="0" />
+      <LineId Id="684" Count="32" />
       <LineId Id="16" Count="0" />
     </LineIds>
   </POU>

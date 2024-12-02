@@ -13,99 +13,61 @@ VAR_IN_OUT
     FillingValve : TValve;       // Struktura ventilu
 END_VAR
 VAR
-    isManual : BOOL; // Příznak manuálního režimu
-	ActualWaterLevel: WORD;
+    fbDO : Valve_2DO;            // Instance funkčního bloku Valve_2DO
+    fbRawToEng : RawToEng;       // Instance funkčního bloku RawToEng
+    analogConversion : TAnalogConversion; // Parametry pro převod
+    scaledWaterLevel : REAL;     // Aktuální hladina vody
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[
-	 
-{region "REGION Aut/Man"}
-// Přepínání mezi režimy
-//IF FillingPhase.Cmd.ManCtrl THEN
-//    isManual := TRUE;
-//    FillingPhase.State.ManCtrl := TRUE;
-//    FillingPhase.State.AutCtrl := FALSE;
-//ELSE
-//    isManual := FALSE;
-//    FillingPhase.State.ManCtrl := FALSE;
-//    FillingPhase.State.AutCtrl := TRUE;
-//END_IF;
-{endregion}
 
-{region "ManCtrl"}
-// Manuální režim
-//IF isManual THEN
-//    IF FillingPhase.Cmd.StartMan THEN
-//        FillingValve.Cmd.OpenMan := TRUE;
-//        FillingPhase.State.Running := TRUE;
-//        FillingPhase.Cmd.StartMan := FALSE;
-//    END_IF;
+// Převod hodnoty ze senzoru
+analogConversion.TransducerLoLevel := 0;
+analogConversion.TransducerHiLevel := 27200;
+analogConversion.ScaledValLoLevel := 0.0;
+analogConversion.ScaledValHiLevel := 2.0;
 
-//    IF FillingPhase.Cmd.StopMan OR FillingPhase.Cmd.PauseMan THEN
-//        FillingValve.Cmd.CloseMan := TRUE;
-//        FillingPhase.State.Running := FALSE;
-//        FillingPhase.Cmd.StopMan := FALSE;
-//        FillingPhase.Cmd.PauseMan := FALSE;
-//    END_IF;
+fbRawToEng(
+    iEnabled := TRUE,
+    wRawValue := Global.aiWaterLevel,
+    AnalogConversion := analogConversion
+);
 
-//    IF FillingPhase.Cmd.ResumeMan THEN
-//        FillingValve.Cmd.OpenMan := TRUE;
-//        FillingPhase.State.Running := TRUE;
-//        FillingPhase.Cmd.ResumeMan := FALSE;
-//    END_IF;
-//END_IF;
-{endregion}
+scaledWaterLevel := fbRawToEng.fScaledValue;
 
-{region "AutCtrl"}
+// Řízení ventilu pomocí Valve_2DO
+fbDO.iOpen := scaledWaterLevel < FillingPhase.ParamFillLevel; // Otevření ventilu
+fbDO.iClose := scaledWaterLevel >= FillingPhase.ParamFillLevel; // Zavření ventilu
+//fbDO.iError := Global.diValveError; // Chyba ventilu
+fbDO.iSecImp := Global.secImp; // Sekundový impuls
+//fbDO.ioValStruct := FillingValve; // Předání struktury ventilu
 
+fbDO(
+    iOpen := scaledWaterLevel < FillingPhase.ParamFillLevel,
+    iClose := scaledWaterLevel >= FillingPhase.ParamFillLevel,
+    //iError := Global.diValveError,
+    iSecImp := Global.secImp,
+    ioValStruct := FillingValve // Přiřazení VAR_IN_OUT parametru
+);
 
+// Aktualizace stavu fáze
+IF fbDO.oOpen THEN
+    FillingPhase.State.Running := TRUE;
+END_IF;
 
-ActualWaterLevel := global.aiWaterLevel;
-
-    IF ActualWaterLevel < FillingPhase.ParamFillLevel THEN
-        Global.diValveFillOpen := TRUE; 
-Global.doValveFillOpen := TRUE;
-Global.doValveFillClose := FALSE;
-    ELSE
-        Global.doValveFillClose := TRUE;
-		Global.diValveFillOpen := FALSE; 
-		Global.doValveFillOpen := FALSE;
-    END_IF;
-	  
-			   
-{endregion}
-// Automatický režim
-
-{endregion}
-
-{region "Done"}
-// Podmínka dokončení
-//IF FillingPhase.WaterLevel >= FillingPhase.ParamFillLevel THEN
-//    FillingPhase.State.Done := TRUE;
-//    FillingPhase.State.Running := FALSE;
-//    FillingValve.Cmd.Req2CloseAut := TRUE;
-//END_IF;
-{endregion}
+IF fbDO.oClose THEN
+    FillingPhase.State.Done := TRUE;
+    FillingPhase.State.Running := FALSE;
+END_IF;
 
 // Povolení fáze
-doEnabled := diEnabled;]]></ST>
+doEnabled := diEnabled;
+]]></ST>
     </Implementation>
     <LineIds Name="Filling">
-      <LineId Id="610" Count="0" />
-      <LineId Id="527" Count="37" />
-      <LineId Id="620" Count="0" />
-      <LineId Id="622" Count="1" />
-      <LineId Id="604" Count="0" />
-      <LineId Id="624" Count="2" />
-      <LineId Id="639" Count="1" />
-      <LineId Id="636" Count="0" />
-      <LineId Id="630" Count="0" />
-      <LineId Id="637" Count="1" />
-      <LineId Id="633" Count="1" />
-      <LineId Id="606" Count="1" />
-      <LineId Id="603" Count="0" />
-      <LineId Id="566" Count="0" />
-      <LineId Id="577" Count="12" />
+      <LineId Id="696" Count="22" />
+      <LineId Id="749" Count="5" />
+      <LineId Id="719" Count="13" />
       <LineId Id="9" Count="0" />
     </LineIds>
   </POU>
