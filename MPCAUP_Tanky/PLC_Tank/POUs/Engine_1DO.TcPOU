@@ -16,26 +16,54 @@ END_VAR
 VAR
 	secImpEdge: BOOL;
 	tempStartupFail: BOOL;
+	
+	rtrig : R_TRIG;
+	timeToStartTON : TON;
 END_VAR
 
-
-]]></Declaration>
+VAR PERSISTENT
+    totalRT : INT; 
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[{region "RunState"}
-    // set real state of engine run into engine structure
-  
+   	IF iRunning THEN
+		ioEngStruct.State.Run := TRUE;		
+	END_IF
 {endregion}
 
 {region "Running time"} 
     // counting running time of engine - (motoseconds in real situation it should be moto hours)
     // detection rising edge of input secimp - should be conected 1Hz internal clock from PLC
-	
+	rtrig(CLK := iSecImp);
+		
+	IF iRunning AND rtrig.Q THEN
+    	totalRT := totalRT + 1;
+	END_IF;
+		 
+	ioEngStruct.State.RT := totalRT;
+
+	 
+	IF ioEngStruct.Cmd.SetRT >= 0 THEN
+		ioEngStruct.State.RT := ioEngStruct.Cmd.SetRT; // Nastavení počtu motosekund
+		ioEngStruct.Cmd.SetRT := -1;                  // Reset uživatelského nastavení
+	END_IF
 {endregion}
 	 
  
 {region "Manual/Automat"}
 	// switching state of engine - automatic or manual control (default state is manual)
-	
+	// pokud je command automat, tak automat, jinak manual
+	IF ioEngStruct.Cmd.AutCtrl THEN
+		ioEngStruct.State.AutCtrl := TRUE;
+		ioEngStruct.State.ManCtrl := FALSE;
+	ELSE
+		ioEngStruct.State.AutCtrl := FALSE;
+		ioEngStruct.State.ManCtrl := TRUE;
+	END_IF
+		 
+	// vynulovani obou prikazu
+	ioEngStruct.Cmd.AutCtrl := FALSE;
+	ioEngStruct.Cmd.ManCtrl := FALSE;
 {endregion}
 	 
 {region "MayRun / MayAutoRun"}
@@ -50,13 +78,34 @@ END_VAR
 {region "ManCtrl"}
 	// processing manual actions - if command is processed, it is set to FALSE even if can't be processed
     // Engine commands are turn off (stop) and turn on (start)
-	
+		 
+	// pokud je manualni rezim a dostaneme prikaz TurnOnMan, tak se nastavi RunOut (a analogicky pro turn off)		  
+	IF ioEngStruct.Cmd.TurnOnMan AND ioEngStruct.State.ManCtrl THEN
+		ioEngStruct.State.RunOut := TRUE;
+	ELSIF ioEngStruct.Cmd.TurnOffMan AND ioEngStruct.State.ManCtrl THEN
+		ioEngStruct.State.RunOut := FALSE;
+	END_IF
+		 
+	// vynulovani obou prikazu
+	ioEngStruct.Cmd.TurnOnMan := FALSE;
+	ioEngStruct.Cmd.TurnOffMan := FALSE;
 {endregion}
 	 
 {region "AutCtrl"}
 	//if request to run in automatic mode set outputs to right states if MAR
     //AutoRequest shouldn't be reseted to false state
-    
+    IF ioEngStruct.State.MayAutoRun AND ioEngStruct.State.AutCtrl THEN
+		ioEngStruct.State.RunOut := ioEngStruct.Cmd.Req2RunAutCtrl; //??????????????????????
+	ELSE 
+		ioEngStruct.State.RunOut := FALSE; //???????????
+	END_IF
+		 
+			  
+				   
+						
+							 
+								  
+									   
 {endregion}
 	 
 {region "Error states"}
@@ -65,6 +114,39 @@ END_VAR
 	// calculating start up fail - if output is sets to start engine, it's expected feedback from running signal in defined time, if feedback doesn't show in this time, it should be start up fail error
 	// merge of these two error is general error
 	
+	timeToStartTON(
+    IN := ioEngStruct.State.RunOut, // Vstup časovače (výstup zařízení)
+    PT := ioEngStruct.Time2Start    // Časový limit pro zpětnou vazbu	
+	);	 
+			  
+	IF timeToStartTON.Q AND NOT ioEngStruct.State.Run THEN
+    ioEngStruct.State.StartUpFail := TRUE;
+	ELSE
+		ioEngStruct.State.StartUpFail := FALSE;
+	END_IF;
+			  
+	IF iError THEN	
+		ioEngStruct.State.Err := TRUE;
+	END_IF;	
+
+
+	IF ioEngStruct.State.Err AND ioEngStruct.State.StartUpFail THEN
+			 ioEngStruct.State.GenErr := TRUE;
+	END_IF;
+		 
+	IF ioEngStruct.Cmd.ResetSUF THEN
+		ioEngStruct.State.StartUpFail := TRUE;
+		ioEngStruct.Cmd.ResetSUF := FALSE;
+	END_IF;
+		 
+	IF ioEngStruct.State.GenErr THEN
+			 ioEngStruct.State.RunOut := FALSE;
+	END_IF;
+
+
+
+
+	   
 {endregion}
 	 
 oRun := ioEngStruct.State.RunOut;
@@ -80,24 +162,43 @@ oRun := ioEngStruct.State.RunOut;
         IF ioEngStruct.State.Run THEN
             ioEngStruct.State.StateInt := Global.RunningAndError;
         ELSE
+
             ioEngStruct.State.StateInt := Global.Err;
         END_IF;
     END_IF; 
 {endregion}]]></ST>
     </Implementation>
     <LineIds Name="Engine_1DO">
-      <LineId Id="367" Count="2" />
+      <LineId Id="367" Count="0" />
+      <LineId Id="636" Count="0" />
+      <LineId Id="675" Count="0" />
+      <LineId Id="674" Count="0" />
       <LineId Id="25" Count="0" />
       <LineId Id="371" Count="0" />
       <LineId Id="370" Count="0" />
       <LineId Id="45" Count="1" />
+      <LineId Id="637" Count="0" />
+      <LineId Id="646" Count="0" />
+      <LineId Id="639" Count="3" />
+      <LineId Id="590" Count="0" />
+      <LineId Id="647" Count="0" />
       <LineId Id="68" Count="0" />
+      <LineId Id="649" Count="2" />
+      <LineId Id="648" Count="0" />
       <LineId Id="40" Count="0" />
       <LineId Id="54" Count="0" />
       <LineId Id="366" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="103" Count="0" />
+      <LineId Id="688" Count="0" />
       <LineId Id="109" Count="0" />
+      <LineId Id="676" Count="0" />
+      <LineId Id="678" Count="0" />
+      <LineId Id="681" Count="2" />
+      <LineId Id="677" Count="0" />
+      <LineId Id="684" Count="0" />
+      <LineId Id="687" Count="0" />
+      <LineId Id="685" Count="1" />
       <LineId Id="71" Count="0" />
       <LineId Id="126" Count="1" />
       <LineId Id="130" Count="2" />
@@ -106,20 +207,44 @@ oRun := ioEngStruct.State.RunOut;
       <LineId Id="128" Count="0" />
       <LineId Id="159" Count="1" />
       <LineId Id="164" Count="1" />
+      <LineId Id="699" Count="1" />
+      <LineId Id="689" Count="1" />
+      <LineId Id="692" Count="1" />
+      <LineId Id="695" Count="3" />
       <LineId Id="180" Count="0" />
       <LineId Id="161" Count="0" />
       <LineId Id="190" Count="1" />
       <LineId Id="194" Count="1" />
+      <LineId Id="701" Count="3" />
       <LineId Id="201" Count="0" />
+      <LineId Id="735" Count="6" />
       <LineId Id="192" Count="0" />
       <LineId Id="202" Count="1" />
       <LineId Id="206" Count="3" />
       <LineId Id="205" Count="0" />
+      <LineId Id="730" Count="2" />
+      <LineId Id="728" Count="1" />
+      <LineId Id="722" Count="0" />
+      <LineId Id="724" Count="1" />
+      <LineId Id="727" Count="0" />
+      <LineId Id="711" Count="0" />
+      <LineId Id="707" Count="1" />
+      <LineId Id="733" Count="1" />
+      <LineId Id="743" Count="2" />
+      <LineId Id="750" Count="4" />
+      <LineId Id="756" Count="0" />
+      <LineId Id="755" Count="0" />
+      <LineId Id="757" Count="1" />
+      <LineId Id="760" Count="1" />
+      <LineId Id="746" Count="3" />
+      <LineId Id="742" Count="0" />
       <LineId Id="204" Count="0" />
       <LineId Id="256" Count="0" />
       <LineId Id="280" Count="1" />
       <LineId Id="259" Count="0" />
-      <LineId Id="390" Count="11" />
+      <LineId Id="390" Count="9" />
+      <LineId Id="759" Count="0" />
+      <LineId Id="400" Count="1" />
       <LineId Id="262" Count="0" />
       <LineId Id="260" Count="0" />
     </LineIds>
