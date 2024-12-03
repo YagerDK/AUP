@@ -21,10 +21,22 @@ END_VAR
     <Implementation>
       <ST><![CDATA[{region "Aut/Man"}
     // switching state of engine - automatic or manual control (default state is manual)
-  	IF NOT isManual THEN
-	   Engine.iRunning := TRUE;
+  	IF  isManual = FALSE THEN
+	  // Engine.iRunning := TRUE;
+			//MixingPhase.Cmd.StartMan := TRUE;
+		//MixingPhase.Cmd.ManCtrl := TRUE;
+		//	 MixingPhase.State.ManCtrl := TRUE;
+				//  MixingPhase.State.Running := TRUE;
+					   
+						//	MixerEng.Cmd.ManCtrl :=TRUE;
+							//	 MixerEng.Cmd.TurnOnMan := TRUE;
+								MixerEng.Cmd.TurnOnMan := TRUE;
+								//	 MixerEng.State.ManCtrl := TRUE;
+	//Engine(iRunning := FALSE, iError := FALSE, iSecImp :=iSecImp, oRun =>, ioEngStruct :=MixerEng);
+				 
+	
 	ELSE 
-		 Engine.iRunning := FALSE;
+		// Engine.iRunning := FALSE;
 	END_IF
 {endregion}
 
@@ -82,7 +94,12 @@ doEnabled := diEnabled;
     <LineIds Name="Mixing">
       <LineId Id="10" Count="1" />
       <LineId Id="24" Count="0" />
-      <LineId Id="182" Count="0" />
+      <LineId Id="221" Count="6" />
+      <LineId Id="220" Count="0" />
+      <LineId Id="228" Count="1" />
+      <LineId Id="214" Count="0" />
+      <LineId Id="212" Count="0" />
+      <LineId Id="210" Count="0" />
       <LineId Id="188" Count="1" />
       <LineId Id="187" Count="0" />
       <LineId Id="25" Count="9" />

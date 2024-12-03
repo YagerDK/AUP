@@ -9,6 +9,10 @@ VAR
 	MixingPhase : TPhaseMixing;
 	MixerEng : TEngine;
 	
+	//pokus
+	
+	mix : Engine_1DO;
+	
     // Struktura fáze Filling
     fillingPhase : TPhaseFilling;
 
@@ -36,24 +40,32 @@ CASE currentState OF
 
     1: // Stav 1 - Napouštění
         // Volání funkčního bloku Filling
-        fbFilling(
-            diEnabled := TRUE,               // Aktivace fáze
-            doEnabled => ,                   // Výstupní parametr
-            FillingPhase := fillingPhase,    // IN_OUT parametr
-            FillingValve := fillingValve     // IN_OUT parametr
-        );
+//        fbFilling(
+//            diEnabled := TRUE,               // Aktivace fáze
+//            doEnabled => ,                   // Výstupní parametr
+//            FillingPhase := fillingPhase,    // IN_OUT parametr
+//            FillingValve := fillingValve     // IN_OUT parametr
+//        );
 		
-		fbMixing(diEnabled := TRUE,
-			iSecImp := Global.secImp,
-			isManual := TRUE,
-			doEnabled =>,
-			MixingPhase := MixingPhase,
-			MixerEng := MixerEng);
+//		fbMixing(diEnabled := TRUE,
+//			iSecImp := Global.secImp,
+//			isManual := TRUE,
+//			doEnabled =>,
+//			MixingPhase := MixingPhase,
+//			MixerEng := MixerEng);
+			
+			//mix(iRunning:= TRUE, iError := FALSE, iSecImp := Global.SecImp,oRun=>,ioEngStruct:=MixerEng);
 
         // Kontrola dokončení fáze
         IF fillingPhase.State.Done THEN
             nextState := 2; // Přechod do další fáze
         END_IF;
+		
+//		Global.Tank1.Mixing.Cmd.ManCtrl := TRUE;
+//		Global.Tank1.Mixing.Cmd.StartMan := TRUE;
+//		Global.Tank1.Mixing.State.ManCtrl := TRUE;
+//		Global.Tank1.Mixing.State.Running := TRUE;
+		
 
     2: // Stav 2 - Zahřívání
         // Logika zahřívání zde
@@ -81,7 +93,12 @@ currentState := nextState;
       <LineId Id="949" Count="19" />
       <LineId Id="1012" Count="5" />
       <LineId Id="1020" Count="0" />
-      <LineId Id="969" Count="25" />
+      <LineId Id="1044" Count="1" />
+      <LineId Id="969" Count="4" />
+      <LineId Id="1046" Count="1" />
+      <LineId Id="1052" Count="2" />
+      <LineId Id="1050" Count="0" />
+      <LineId Id="974" Count="20" />
       <LineId Id="368" Count="0" />
     </LineIds>
   </POU>
