@@ -100,11 +100,7 @@ END_VAR]]></Declaration>
 		ioEngStruct.State.RunOut := FALSE; //???????????
 	END_IF
 		 
-			  
-				   
-						
-							 
-								  
+			  						  
 									   
 {endregion}
 	 
@@ -217,7 +213,8 @@ oRun := ioEngStruct.State.RunOut;
       <LineId Id="194" Count="1" />
       <LineId Id="701" Count="3" />
       <LineId Id="201" Count="0" />
-      <LineId Id="735" Count="6" />
+      <LineId Id="735" Count="1" />
+      <LineId Id="741" Count="0" />
       <LineId Id="192" Count="0" />
       <LineId Id="202" Count="1" />
       <LineId Id="206" Count="3" />

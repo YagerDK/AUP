@@ -4,6 +4,7 @@
     <Declaration><![CDATA[FUNCTION_BLOCK Heater
 VAR_INPUT
 	iWaterTemp : REAL;
+	maxWaterTemp: REAL; // pridano TM
 END_VAR
 VAR_OUTPUT
 	oHeaterEnable : BOOL;
@@ -42,7 +43,17 @@ ioHeatStruct.State.HeatingOut := ioHeatStruct.PID.fOut;
 	 
 {region "Manual/Automat"}
 // switching state of engine - automatic or manual control (default state is manual)
-
+	IF ioHeatStruct.Cmd.AutCtrl THEN
+		ioHeatStruct.State.AutCtrl := TRUE;
+		ioHeatStruct.State.ManCtrl := FALSE;
+	ELSE
+		ioHeatStruct.State.AutCtrl := FALSE;
+		ioHeatStruct.State.ManCtrl := TRUE;
+	END_IF
+		 
+	// vynulovani obou prikazu
+	ioHeatStruct.Cmd.AutCtrl := FALSE;
+	ioHeatStruct.Cmd.ManCtrl := FALSE;
 {endregion}
 	 
  
@@ -50,17 +61,35 @@ ioHeatStruct.State.HeatingOut := ioHeatStruct.PID.fOut;
 // processing manual actions - if command is processed, it is set to FALSE even if can't be processed
 // Engine commands are turn off (stop) and turn on (start)
 
+	 IF ioHeatStruct.Cmd.TurnOnMan AND ioHeatStruct.State.ManCtrl THEN
+		ioHeatStruct.State.EnableOut := TRUE; //??????????????
+	ELSIF ioHeatStruct.Cmd.TurnOffMan AND ioHeatStruct.State.ManCtrl THEN
+		ioHeatStruct.State.EnableOut := FALSE; //??????????????????
+	END_IF
+		 
+	// vynulovani obou prikazu
+	ioHeatStruct.Cmd.TurnOnMan := FALSE;
+	ioHeatStruct.Cmd.TurnOffMan := FALSE;
+		  
 {endregion}
  
 {region "AutCtrl"}
 //if request to run in automatic mode set outputs to right states if MAR
 //AutoRequest shouldn't be reseted to false state
-
+   IF ioHeatStruct.State.AutCtrl THEN //?????
+		ioHeatStruct.State.EnableOut := ioHeatStruct.Cmd.Req2RunAutCtrl; //??????????????????????
+	ELSE 
+		ioHeatStruct.State.EnableOut := FALSE; //???????????
+	END_IF
+		 
 {endregion}
  
 {region "Error states"}
 // if water temperature is too high, stop heating and generate error
-
+IF iWaterTemp > maxWaterTemp THEN
+	ioHeatStruct.State.Err := TRUE;
+	ioHeatStruct.State.GenErr := TRUE; 
+END_IF
 {endregion}
 	 
  
@@ -86,20 +115,28 @@ oHeaterEnable := ioHeatStruct.State.EnableOut;]]></ST>
       <LineId Id="54" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="321" Count="0" />
+      <LineId Id="451" Count="9" />
       <LineId Id="109" Count="0" />
       <LineId Id="71" Count="0" />
       <LineId Id="126" Count="0" />
       <LineId Id="159" Count="1" />
       <LineId Id="337" Count="1" />
+      <LineId Id="461" Count="0" />
+      <LineId Id="463" Count="7" />
       <LineId Id="180" Count="0" />
+      <LineId Id="462" Count="0" />
       <LineId Id="161" Count="0" />
       <LineId Id="190" Count="1" />
       <LineId Id="349" Count="1" />
+      <LineId Id="471" Count="4" />
       <LineId Id="201" Count="0" />
       <LineId Id="192" Count="0" />
       <LineId Id="202" Count="1" />
       <LineId Id="354" Count="0" />
       <LineId Id="436" Count="0" />
+      <LineId Id="476" Count="0" />
+      <LineId Id="478" Count="0" />
+      <LineId Id="477" Count="0" />
       <LineId Id="204" Count="0" />
       <LineId Id="434" Count="0" />
       <LineId Id="256" Count="0" />
