@@ -5,6 +5,9 @@
 VAR
     // Instance funkčního bloku Filling
     fbFilling : Filling;
+	fbMixing : Mixing;
+	MixingPhase : TPhaseMixing;
+	MixerEng : TEngine;
 	
     // Struktura fáze Filling
     fillingPhase : TPhaseFilling;
@@ -21,7 +24,7 @@ END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[
 
-// Generování časového impulsu
+// Generování časového impulsu,
 Global.secImp := NOT(Global.secImp);
 
 // Stavový automat
@@ -39,6 +42,13 @@ CASE currentState OF
             FillingPhase := fillingPhase,    // IN_OUT parametr
             FillingValve := fillingValve     // IN_OUT parametr
         );
+		
+		fbMixing(diEnabled := TRUE,
+			iSecImp := Global.secImp,
+			isManual := TRUE,
+			doEnabled =>,
+			MixingPhase := MixingPhase,
+			MixerEng := MixerEng);
 
         // Kontrola dokončení fáze
         IF fillingPhase.State.Done THEN
@@ -68,7 +78,10 @@ currentState := nextState;
 ]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
-      <LineId Id="949" Count="45" />
+      <LineId Id="949" Count="19" />
+      <LineId Id="1012" Count="5" />
+      <LineId Id="1020" Count="0" />
+      <LineId Id="969" Count="25" />
       <LineId Id="368" Count="0" />
     </LineIds>
   </POU>

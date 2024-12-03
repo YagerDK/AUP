@@ -5,6 +5,7 @@
 VAR_INPUT
 	diEnabled : BOOL;
 	iSecImp : BOOL;
+	isManual : BOOL;
 END_VAR
 VAR_OUTPUT
 	doEnabled : BOOL;
@@ -14,12 +15,17 @@ VAR_IN_OUT
 	MixerEng : TEngine;
 END_VAR
 VAR
+Engine : Engine_1DO; 
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[{region "Aut/Man"}
     // switching state of engine - automatic or manual control (default state is manual)
-  
+  	IF NOT isManual THEN
+	   Engine.iRunning := TRUE;
+	ELSE 
+		 Engine.iRunning := FALSE;
+	END_IF
 {endregion}
 
 {region "ManCtrl"}
@@ -36,7 +42,11 @@ END_VAR
 {region "AutCtrl"}
     // if request to run in automatic mode -> set auto request to mixing to 1, if not request to mixing is 0
     // commands should be sets to false after their processing
-   
+//   	IF Engine.ioEngStruct.State.AutCtrl THEN
+//		 Engine.iRunning := TRUE;	
+//	ELSE
+//		 Engine.iRunning := FALSE;
+//	END_IF
 {endregion}
 
 {region "Done"}
@@ -71,9 +81,17 @@ doEnabled := diEnabled;
     </Implementation>
     <LineIds Name="Mixing">
       <LineId Id="10" Count="1" />
-      <LineId Id="24" Count="10" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="182" Count="0" />
+      <LineId Id="188" Count="1" />
+      <LineId Id="187" Count="0" />
+      <LineId Id="25" Count="9" />
       <LineId Id="78" Count="5" />
-      <LineId Id="99" Count="1" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="190" Count="0" />
+      <LineId Id="192" Count="1" />
+      <LineId Id="191" Count="0" />
+      <LineId Id="100" Count="0" />
       <LineId Id="103" Count="3" />
       <LineId Id="123" Count="4" />
       <LineId Id="132" Count="18" />
