@@ -27,12 +27,26 @@ END_VAR
     // set real state of valve input into valve structure - input of valve can be taken from limit sensor...
     ioValStruct.State.Open := iOpen;
     ioValStruct.State.Closed := iClose;
+		 
+
 {endregion}
 
 	 
 {region "Manual/Automat"}
 	// switching state of engine - automatic or manual control (default state is manual)
 	
+	IF ioValStruct.Cmd.AutCtrl THEN
+		ioValStruct.State.AutCtrl := TRUE;
+		ioValStruct.State.ManCtrl := FALSE;
+	ELSE
+		ioValStruct.State.AutCtrl := FALSE;
+		ioValStruct.State.ManCtrl := TRUE;
+	END_IF
+		 
+	// vynulovani obou prikazu
+	ioValStruct.Cmd.AutCtrl := FALSE;
+	ioValStruct.Cmd.ManCtrl := FALSE; 
+			  
 {endregion}
 	 
 {region "MayRun / MayAutoRun"}
@@ -153,12 +167,15 @@ oClose := ioValStruct.State.CloseOut;
       <LineId Id="303" Count="0" />
       <LineId Id="307" Count="1" />
       <LineId Id="446" Count="0" />
+      <LineId Id="467" Count="1" />
       <LineId Id="305" Count="0" />
       <LineId Id="304" Count="0" />
       <LineId Id="54" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="103" Count="0" />
       <LineId Id="109" Count="0" />
+      <LineId Id="473" Count="9" />
+      <LineId Id="471" Count="1" />
       <LineId Id="71" Count="0" />
       <LineId Id="126" Count="1" />
       <LineId Id="329" Count="0" />
