@@ -54,7 +54,7 @@ CASE currentState OF
 //			MixingPhase := MixingPhase,
 //			MixerEng := MixerEng);
 			
-			//mix(iRunning:= TRUE, iError := FALSE, iSecImp := Global.SecImp,oRun=>,ioEngStruct:=MixerEng);
+			//mix(iRunning:= TRUE, iError := FALSE, iSecImp := Global.SecImp,oRun=>,ioHeatStruct:=MixerEng);
 
         // Kontrola dokončení fáze
         IF fillingPhase.State.Done THEN

@@ -44,22 +44,26 @@ ioHeatStruct.State.HeatingOut := ioHeatStruct.PID.fOut;
 {region "Manual/Automat"}
 // switching state of engine - automatic or manual control (default state is manual)
 	
-	IF NOT ioHeatStruct.State.AutCtrl AND NOT ioHeatStruct.State.ManCtrl THEN
-		ioHeatStruct.State.AutCtrl := FALSE;
-		ioHeatStruct.State.ManCtrl := TRUE;
-	ELSE
-
-	IF ioHeatStruct.Cmd.AutCtrl THEN
+IF ioHeatStruct.Cmd.AutCtrl THEN
 		ioHeatStruct.State.AutCtrl := TRUE;
-		ioHeatStruct.State.ManCtrl := FALSE;
-	ELSE
+		ioHeatStruct.State.ManCtrl := FALSE;	 
+	END_IF
+		 
+	IF ioHeatStruct.Cmd.ManCtrl THEN
 		ioHeatStruct.State.AutCtrl := FALSE;
 		ioHeatStruct.State.ManCtrl := TRUE;
-	END_IF
+	END_IF;
+		 
+	IF NOT ioHeatStruct.State.AutCtrl AND NOT ioHeatStruct.State.ManCtrl THEN
+		ioHeatStruct.State.ManCtrl := TRUE;
+		ioHeatStruct.State.AutCtrl := FALSE;
+	END_IF;
 		 
 	// vynulovani obou prikazu
 	ioHeatStruct.Cmd.AutCtrl := FALSE;
 	ioHeatStruct.Cmd.ManCtrl := FALSE;
+{endregion}
+	
 {endregion}
 	 
  
@@ -120,10 +124,8 @@ oHeaterEnable := ioHeatStruct.State.EnableOut;]]></ST>
       <LineId Id="9" Count="0" />
       <LineId Id="321" Count="0" />
       <LineId Id="451" Count="0" />
-      <LineId Id="497" Count="2" />
-      <LineId Id="495" Count="1" />
-      <LineId Id="494" Count="0" />
-      <LineId Id="452" Count="8" />
+      <LineId Id="537" Count="17" />
+      <LineId Id="536" Count="0" />
       <LineId Id="109" Count="0" />
       <LineId Id="71" Count="0" />
       <LineId Id="126" Count="0" />

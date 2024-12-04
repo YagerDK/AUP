@@ -23,22 +23,24 @@ END_VAR
       <ST><![CDATA[{region "Aut/Man"}
     // switching state of engine - automatic or manual control (default state is manual)
 
-	 IF NOT HeatingPhase.Cmd.AutCtrl AND NOT HeatingPhase.Cmd.ManCtrl THEN
-		HeatingPhase.State.ManCtrl := TRUE;
-		HeatingPhase.State.AutCtrl := FALSE;
-	END_IF;
 		  
 	IF HeatingPhase.Cmd.AutCtrl THEN
 		HeatingPhase.State.AutCtrl := TRUE;
 		HeatingPhase.State.ManCtrl := FALSE;
+		//HeatingPhase.Cmd.AutCtrl := FALSE;
 	END_IF;
 	
 	IF HeatingPhase.Cmd.ManCtrl THEN
 		HeatingPhase.State.ManCtrl := TRUE;
 		HeatingPhase.State.AutCtrl := FALSE;
+		//HeatingPhase.Cmd.ManCtrl := FALSE;
 	END_IF;
 	
 	
+	 IF NOT HeatingPhase.Cmd.AutCtrl AND NOT HeatingPhase.Cmd.ManCtrl THEN
+		HeatingPhase.State.ManCtrl := TRUE;
+		HeatingPhase.State.AutCtrl := FALSE;
+	END_IF;
 	 
 {endregion}
 
@@ -167,13 +169,14 @@ doEnabled := diEnabled;]]></ST>
     </Implementation>
     <LineIds Name="Heating">
       <LineId Id="72" Count="1" />
-      <LineId Id="345" Count="0" />
-      <LineId Id="347" Count="2" />
       <LineId Id="328" Count="0" />
       <LineId Id="346" Count="0" />
       <LineId Id="330" Count="2" />
+      <LineId Id="503" Count="0" />
       <LineId Id="334" Count="4" />
+      <LineId Id="504" Count="0" />
       <LineId Id="340" Count="1" />
+      <LineId Id="505" Count="3" />
       <LineId Id="329" Count="0" />
       <LineId Id="86" Count="5" />
       <LineId Id="350" Count="4" />
