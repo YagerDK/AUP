@@ -19,57 +19,140 @@ VAR
     scaledWaterLevel : REAL;     // Aktuální hladina vody
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
+      <ST><![CDATA[{region "REGION Aut/Man"}
+    // switching state of engine - automatic or manual control (default state is manual)
+	IF FillingPhase.Cmd.AutCtrl THEN
+			FillingPhase.State.AutCtrl := TRUE;
+        	FillingPhase.State.ManCtrl := FALSE;
+        	FillingPhase.Cmd.AutCtrl := FALSE; //mozna navic
+    	END_IF;
+    IF FillingPhase.Cmd.ManCtrl THEN
+        	FillingPhase.State.AutCtrl := FALSE;
+       		FillingPhase.State.ManCtrl := TRUE;
+       		FillingPhase.Cmd.ManCtrl := FALSE; //mozna navic
+    END_IF;
+    IF NOT FillingPhase.State.AutCtrl AND NOT FillingPhase.State.ManCtrl THEN
+        		FillingPhase.State.ManCtrl := TRUE;
+   		END_IF;
 
-// Převod hodnoty ze senzoru
-analogConversion.TransducerLoLevel := 0;
-analogConversion.TransducerHiLevel := 27200;
-analogConversion.ScaledValLoLevel := 0.0;
-analogConversion.ScaledValHiLevel := 2.0;
+{endregion}
 
-fbRawToEng(
-    iEnabled := TRUE,
-    wRawValue := Global.aiWaterLevel,
-    AnalogConversion := analogConversion
-);
+{region "ManCtrl"}
+    // processing manual actions - if command is processed, it is sets to FALSE even if can't be processed
+    // Phase commands are start, stop, pause and resume 
+    // Start - open filling valve 
+    // Stop - close filling valve
+    // Pause - close filling valve
+    // Resume - open filling valve
+    // real states of phase are writed into states in phase structure
+		 
+	IF FillingPhase.State.ManCtrl THEN
+         IF FillingPhase.Cmd.StartMan AND FillingPhase.State.Idle THEN
+             	FillingPhase.State.Running := TRUE;
+             	FillingPhase.State.Idle := FALSE;
+            	 FillingPhase.State.Done := FALSE;
+        	 END_IF;
+         IF FillingPhase.Cmd.PauseMan AND FillingPhase.State.Running THEN
+            	 FillingPhase.State.Paused := TRUE;
+            	 FillingPhase.State.Running := FALSE;
+            	 FillingPhase.State.Done := FALSE;
+         END_IF;
+         IF FillingPhase.Cmd.ResumeMan AND FillingPhase.State.Paused THEN
+             	FillingPhase.State.Running := TRUE;
+             	FillingPhase.State.Paused := FALSE;
+             	FillingPhase.State.Done := FALSE;
+        	 END_IF;
+         IF FillingPhase.Cmd.StopMan AND (FillingPhase.State.Paused OR FillingPhase.State.Running) THEN
+             	FillingPhase.State.Idle := TRUE;
+             	FillingPhase.State.Paused := FALSE;
+             	FillingPhase.State.Running := FALSE;
+             	FillingPhase.State.Done := FALSE;
+        	 END_IF;
+         FillingPhase.Cmd.StartMan := FALSE;
+         FillingPhase.Cmd.PauseMan := FALSE;
+         FillingPhase.Cmd.ResumeMan := FALSE;
+         FillingPhase.Cmd.StopMan := FALSE;
+     END_IF;		 
+	
+   
+{endregion}
 
-scaledWaterLevel := fbRawToEng.fScaledValue;
+{region "AutCtrl"}
+    // if request to run in automatic mode and phase can be run in automatic mode switch phase to running
+     IF FillingPhase.State.AutCtrl THEN
+        IF FillingPhase.Cmd.StartAut AND FillingPhase.State.Idle THEN
+            	FillingPhase.State.Running := TRUE;
+           	 	FillingPhase.State.Idle := FALSE;
+       		 END_IF;
+        IF FillingPhase.Cmd.StopAut AND FillingPhase.State.Running THEN
+            	FillingPhase.State.Idle := TRUE;
+            	FillingPhase.State.Running := FALSE;
+       		 END_IF;
+        FillingPhase.Cmd.StartAut := FALSE;
+        FillingPhase.Cmd.StopAut := FALSE;
+    END_IF;
+{endregion}
 
-// Řízení ventilu pomocí Valve_2DO
-fbDO.iOpen := scaledWaterLevel < FillingPhase.ParamFillLevel; // Otevření ventilu
-fbDO.iClose := scaledWaterLevel >= FillingPhase.ParamFillLevel; // Zavření ventilu
-//fbDO.iError := Global.diValveError; // Chyba ventilu
-fbDO.iSecImp := Global.secImp; // Sekundový impuls
-//fbDO.ioValStruct := FillingValve; // Předání struktury ventilu
+{region "Done"}
+    //every phase should have finish condition - filling phase - if water level is above requested level
+    //after that done state should be setted to 1
+   IF FillingPhase.WaterLevel >= FillingPhase.ParamFillLevel THEN
+        	FillingPhase.Cmd.StopMan := TRUE;
+        	FillingPhase.State.Done := TRUE;
+    END_IF;
+    // command reset done resets done state and than resets command
+    IF FillingPhase.Cmd.ResetDone THEN
+        	FillingPhase.State.Done := FALSE;
+        	FillingPhase.Cmd.ResetDone := FALSE;
+    END_IF;
+{endregion}
 
-fbDO(
-    iOpen := scaledWaterLevel < FillingPhase.ParamFillLevel,
-    iClose := FALSE, // scaledWaterLevel >= FillingPhase.ParamFillLevel,
-    //iError := Global.diValveError,
-    iSecImp := Global.secImp,
-    ioValStruct := FillingValve // Přiřazení VAR_IN_OUT parametru
-);
+{region "States"} 
+    //Command valve in cases of states
+	IF FillingPhase.State.Running THEN
+        	FillingValve.Cmd.Req2OpenAut := TRUE;
+        	FillingValve.Cmd.Req2CloseAut := FALSE;
+    END_IF;
+    IF FillingPhase.State.Idle OR FillingPhase.State.Paused THEN
+        	FillingValve.Cmd.Req2CloseAut := TRUE;
+        	FillingValve.Cmd.Req2OpenAut := FALSE;
+    END_IF;
+{endregion}
 
-// Aktualizace stavu fáze
-IF fbDO.oOpen THEN
-    FillingPhase.State.Running := TRUE;
+
+// delault state of phase - if not any state sets state to idle
+IF NOT FillingPhase.State.Idle AND NOT FillingPhase.State.Paused AND NOT FillingPhase.State.Running THEN
+    FillingPhase.State.Idle := 1;
 END_IF;
 
-IF fbDO.oClose THEN
-    FillingPhase.State.Done := TRUE;
-    FillingPhase.State.Running := FALSE;
+// write binary states into int value for visualization
+IF FillingPhase.State.Idle THEN
+    FillingPhase.State.Stateint := Global.PhIdle;
+ELSIF FillingPhase.State.Running THEN
+    FillingPhase.State.Stateint := Global.PhRunning;
+ELSE
+    FillingPhase.State.Stateint := Global.PhPause;
 END_IF;
 
-// Povolení fáze
-doEnabled := diEnabled;
-]]></ST>
+// Ponechte pro moznost retezeni volani bloku v LAD
+doEnabled := diEnabled;]]></ST>
     </Implementation>
     <LineIds Name="Filling">
-      <LineId Id="696" Count="14" />
-      <LineId Id="772" Count="0" />
-      <LineId Id="712" Count="6" />
-      <LineId Id="749" Count="5" />
-      <LineId Id="719" Count="13" />
+      <LineId Id="789" Count="1" />
+      <LineId Id="846" Count="0" />
+      <LineId Id="859" Count="0" />
+      <LineId Id="848" Count="10" />
+      <LineId Id="791" Count="11" />
+      <LineId Id="929" Count="25" />
+      <LineId Id="803" Count="0" />
+      <LineId Id="809" Count="5" />
+      <LineId Id="955" Count="10" />
+      <LineId Id="815" Count="5" />
+      <LineId Id="966" Count="1" />
+      <LineId Id="969" Count="5" />
+      <LineId Id="821" Count="4" />
+      <LineId Id="975" Count="6" />
+      <LineId Id="826" Count="18" />
       <LineId Id="9" Count="0" />
     </LineIds>
   </POU>
