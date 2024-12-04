@@ -5,7 +5,6 @@
 VAR_INPUT
 	diEnabled : BOOL;
 	iSecImp : BOOL;
-	isManual : BOOL;
 END_VAR
 VAR_OUTPUT
 	doEnabled : BOOL;
@@ -15,29 +14,27 @@ VAR_IN_OUT
 	MixerEng : TEngine;
 END_VAR
 VAR
-Engine : Engine_1DO; 
+ElapsedTime : INT;
+iR_TRIG : R_TRIG;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[{region "Aut/Man"}
-    // switching state of engine - automatic or manual control (default state is manual)
-  	IF  isManual = FALSE THEN
-	  // Engine.iRunning := TRUE;
-			//MixingPhase.Cmd.StartMan := TRUE;
-		//MixingPhase.Cmd.ManCtrl := TRUE;
-		//	 MixingPhase.State.ManCtrl := TRUE;
-				//  MixingPhase.State.Running := TRUE;
-					   
-						//	MixerEng.Cmd.ManCtrl :=TRUE;
-							//	 MixerEng.Cmd.TurnOnMan := TRUE;
-								MixerEng.Cmd.TurnOnMan := TRUE;
-								//	 MixerEng.State.ManCtrl := TRUE;
-	//Engine(iRunning := FALSE, iError := FALSE, iSecImp :=iSecImp, oRun =>, ioEngStruct :=MixerEng);
-				 
-	
-	ELSE 
-		// Engine.iRunning := FALSE;
+	IF MixingPhase.Cmd.AutCtrl THEN
+		MixingPhase.State.AutCtrl := TRUE;
+		MixingPhase.State.ManCtrl := FALSE;	 
 	END_IF
+		 
+	IF MixingPhase.Cmd.ManCtrl THEN
+		MixingPhase.State.AutCtrl := FALSE;
+		MixingPhase.State.ManCtrl := TRUE;
+	END_IF;
+		 
+	IF NOT MixingPhase.State.AutCtrl AND NOT MixingPhase.State.ManCtrl THEN
+		MixingPhase.State.ManCtrl := TRUE;
+		MixingPhase.State.AutCtrl := FALSE;
+	END_IF;
+ 
 {endregion}
 
 {region "ManCtrl"}
@@ -48,30 +45,103 @@ END_VAR
     // Pause - stop mixing 
     // Resume - start mixing
     // real states of phase are writed into states in phase structure
+		 
+	IF MixingPhase.State.ManCtrl THEN
+		IF MixingPhase.Cmd.StartMan AND MixingPhase.State.Idle THEN
+			MixingPhase.State.Running := TRUE;
+			MixingPhase.State.Idle := FALSE;
+			MixingPhase.State.Paused := FALSE;
+			MixingPhase.State.Done := FALSE;	 
+		END_IF
+			 
+		IF MixingPhase.Cmd.PauseMan AND MixingPhase.State.Running THEN
+			MixingPhase.State.Running := FALSE;
+			MixingPhase.State.Idle := FALSE;
+			MixingPhase.State.Paused := TRUE;
+			MixingPhase.State.Done := FALSE;	 
+		END_IF
+			 
+				  
+		IF MixingPhase.Cmd.ResumeMan AND MixingPhase.State.Paused THEN
+			MixingPhase.State.Running := TRUE;
+			MixingPhase.State.Idle := FALSE;
+			MixingPhase.State.Paused := FALSE;
+			MixingPhase.State.Done := FALSE;	 
+		END_IF
+			 
+		IF MixingPhase.Cmd.StopMan AND (MixingPhase.State.Running OR MixingPhase.State.Paused) THEN
+			MixingPhase.State.Running := FALSE;
+			MixingPhase.State.Idle := TRUE;
+			MixingPhase.State.Paused := FALSE;
+			MixingPhase.State.Done := FALSE;	 
+		END_IF
+			 
+		MixingPhase.State.Running := FALSE;
+		MixingPhase.State.Idle := FALSE;
+		MixingPhase.State.Paused := FALSE;
+		MixingPhase.State.Done := FALSE;		 		  
+	END_IF
    
 {endregion}
 
 {region "AutCtrl"}
     // if request to run in automatic mode -> set auto request to mixing to 1, if not request to mixing is 0
-    // commands should be sets to false after their processing
-//   	IF Engine.ioEngStruct.State.AutCtrl THEN
-//		 Engine.iRunning := TRUE;	
-//	ELSE
-//		 Engine.iRunning := FALSE;
-//	END_IF
+  
+	IF MixingPhase.State.AutCtrl THEN
+		IF MixingPhase.Cmd.StartAut AND MixingPhase.State.Idle THEN
+			MixingPhase.State.Running := TRUE;
+			MixingPhase.State.Idle := FALSE;	
+		END_IF
+		IF MixingPhase.Cmd.StopAut AND MixingPhase.State.Running THEN
+			MixingPhase.State.Idle := TRUE;
+			MixingPhase.State.Running := FALSE;
+		END_IF
+		MixingPhase.Cmd.StartAut := FALSE;
+		MixingPhase.Cmd.StopAut := FALSE;
+	END_IF
+ 
+ 	
 {endregion}
 
 {region "Done"}
     // every phase should have finish condition - mixing phase - if time of runnig is bigger or same as requested
     // after that done state should be setted to 1
- 
+ 	
+
+iR_TRIG(CLK := Global.secImp);
+
+// Počítání uběhlého času
+IF iR_TRIG.Q THEN
+    IF MixingPhase.State.Idle THEN
+        ElapsedTime := 0; 
+    ELSIF MixingPhase.State.Running THEN
+        ElapsedTime := ElapsedTime + 1; 
+    END_IF;
+END_IF;
+
+// Kontrola dokončení fáze
+IF ElapsedTime >= MixingPhase.ParamTimeSec THEN
+    MixingPhase.State.Done := TRUE;
+END_IF;
+
+// Resetování stavu Done
+IF MixingPhase.Cmd.ResetDone THEN
+    MixingPhase.State.Done := FALSE;
+    MixingPhase.Cmd.ResetDone := FALSE;
+END_IF;
+
 {endregion}
 
 {region "States"}
     //Command mixer in cases of states
-
+	IF MixingPhase.State.Running THEN
+		MixerEng.Cmd.Req2RunAutCtrl := TRUE;
+	END_IF;
+	IF MixingPhase.State.Idle OR MixingPhase.State.Paused THEN
+		MixerEng.Cmd.Req2RunAutCtrl := FALSE;
+	END_IF;
 {endregion}
- MixingPhase.State.Running := TRUE;
+
 
 // delault state of phase - if not any state sets state to idle
 IF NOT MixingPhase.State.Idle AND NOT MixingPhase.State.Done AND NOT MixingPhase.State.Paused AND NOT MixingPhase.State.Running THEN
@@ -92,25 +162,50 @@ doEnabled := diEnabled;
 ]]></ST>
     </Implementation>
     <LineIds Name="Mixing">
-      <LineId Id="10" Count="1" />
-      <LineId Id="24" Count="0" />
-      <LineId Id="221" Count="6" />
-      <LineId Id="220" Count="0" />
-      <LineId Id="228" Count="1" />
-      <LineId Id="214" Count="0" />
-      <LineId Id="212" Count="0" />
-      <LineId Id="210" Count="0" />
-      <LineId Id="188" Count="1" />
+      <LineId Id="10" Count="0" />
       <LineId Id="187" Count="0" />
+      <LineId Id="258" Count="0" />
+      <LineId Id="260" Count="0" />
+      <LineId Id="259" Count="0" />
+      <LineId Id="261" Count="0" />
+      <LineId Id="264" Count="2" />
+      <LineId Id="268" Count="0" />
+      <LineId Id="273" Count="0" />
+      <LineId Id="269" Count="3" />
+      <LineId Id="262" Count="0" />
       <LineId Id="25" Count="9" />
-      <LineId Id="78" Count="5" />
-      <LineId Id="99" Count="0" />
-      <LineId Id="190" Count="0" />
-      <LineId Id="192" Count="1" />
+      <LineId Id="274" Count="1" />
+      <LineId Id="283" Count="4" />
+      <LineId Id="282" Count="0" />
+      <LineId Id="288" Count="0" />
+      <LineId Id="290" Count="4" />
+      <LineId Id="289" Count="0" />
+      <LineId Id="295" Count="1" />
+      <LineId Id="303" Count="4" />
+      <LineId Id="297" Count="0" />
+      <LineId Id="308" Count="0" />
+      <LineId Id="310" Count="4" />
+      <LineId Id="309" Count="0" />
+      <LineId Id="320" Count="0" />
+      <LineId Id="317" Count="2" />
+      <LineId Id="315" Count="0" />
+      <LineId Id="277" Count="0" />
+      <LineId Id="78" Count="4" />
       <LineId Id="191" Count="0" />
+      <LineId Id="321" Count="1" />
+      <LineId Id="325" Count="2" />
+      <LineId Id="330" Count="5" />
+      <LineId Id="329" Count="0" />
+      <LineId Id="328" Count="0" />
+      <LineId Id="323" Count="0" />
       <LineId Id="100" Count="0" />
       <LineId Id="103" Count="3" />
-      <LineId Id="123" Count="4" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="350" Count="13" />
+      <LineId Id="366" Count="7" />
+      <LineId Id="341" Count="0" />
+      <LineId Id="124" Count="3" />
+      <LineId Id="336" Count="4" />
       <LineId Id="132" Count="18" />
       <LineId Id="9" Count="0" />
       <LineId Id="166" Count="0" />

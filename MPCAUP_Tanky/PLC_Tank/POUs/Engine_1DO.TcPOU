@@ -54,17 +54,26 @@ END_VAR]]></Declaration>
 {region "Manual/Automat"}
 	// switching state of engine - automatic or manual control (default state is manual)
 	// pokud je command automat, tak automat, jinak manual
+	
+			  
 	IF ioEngStruct.Cmd.AutCtrl THEN
 		ioEngStruct.State.AutCtrl := TRUE;
-		//ioEngStruct.State.ManCtrl := FALSE;
-	ELSE
+		ioEngStruct.State.ManCtrl := FALSE;	 
+	END_IF
+		 
+	IF ioEngStruct.Cmd.ManCtrl THEN
 		ioEngStruct.State.AutCtrl := FALSE;
 		ioEngStruct.State.ManCtrl := TRUE;
-	END_IF
+	END_IF;
+		 
+	IF NOT ioEngStruct.State.AutCtrl AND NOT ioEngStruct.State.ManCtrl THEN
+		ioEngStruct.State.ManCtrl := TRUE;
+		ioEngStruct.State.AutCtrl := FALSE;
+	END_IF;
 		 
 	// vynulovani obou prikazu
 	ioEngStruct.Cmd.AutCtrl := FALSE;
-	//ioEngStruct.Cmd.ManCtrl := FALSE;
+	ioEngStruct.Cmd.ManCtrl := FALSE;
 {endregion}
 	 
 {region "MayRun / MayAutoRun"}
@@ -81,31 +90,23 @@ END_VAR]]></Declaration>
     // Engine commands are turn off (stop) and turn on (start)
 		 
 	// pokud je manualni rezim a dostaneme prikaz TurnOnMan, tak se nastavi RunOut (a analogicky pro turn off)		  
-	IF ioEngStruct.Cmd.TurnOnMan AND ioEngStruct.State.ManCtrl THEN
-			 
-				  
+	IF ioEngStruct.Cmd.TurnOnMan AND ioEngStruct.State.MayRun THEN		  
 		ioEngStruct.State.RunOut := TRUE;	
-		
-			 ioEngStruct.State.MayRun:=TRUE;
-				  ioEngStruct.Cmd.ManCtrl := TRUE;
-		
-	
-	ELSIF ioEngStruct.Cmd.TurnOffMan AND ioEngStruct.State.ManCtrl THEN
-		//ioEngStruct.State.RunOut := FALSE;
+		ioEngStruct.Cmd.TurnOnMan := FALSE;	 
 	END_IF
 		 
-	// vynulovani obou prikazu
-	//ioEngStruct.Cmd.TurnOnMan := FALSE;
-	ioEngStruct.Cmd.TurnOffMan := FALSE;
+	IF ioEngStruct.Cmd.TurnOffMan AND ioEngStruct.State.MayRun THEN
+		ioEngStruct.State.RunOut := FALSE;
+		ioEngStruct.Cmd.TurnOffMan := FALSE;
+	END_IF
+	
 {endregion}
 	 
 {region "AutCtrl"}
 	//if request to run in automatic mode set outputs to right states if MAR
     //AutoRequest shouldn't be reseted to false state
     IF ioEngStruct.State.MayAutoRun AND ioEngStruct.State.AutCtrl THEN
-		//ioEngStruct.State.RunOut := ioEngStruct.Cmd.Req2RunAutCtrl; //??????????????????????
-	ELSE 
-		//ioEngStruct.State.RunOut := FALSE; //???????????
+		ioEngStruct.State.RunOut := ioEngStruct.Cmd.Req2RunAutCtrl;
 	END_IF
 		 
 			  						  
@@ -196,9 +197,10 @@ oRun := ioEngStruct.State.RunOut;
       <LineId Id="9" Count="0" />
       <LineId Id="103" Count="0" />
       <LineId Id="688" Count="0" />
-      <LineId Id="109" Count="0" />
-      <LineId Id="676" Count="0" />
-      <LineId Id="789" Count="5" />
+      <LineId Id="903" Count="1" />
+      <LineId Id="906" Count="12" />
+      <LineId Id="905" Count="0" />
+      <LineId Id="794" Count="0" />
       <LineId Id="687" Count="0" />
       <LineId Id="685" Count="1" />
       <LineId Id="71" Count="0" />
@@ -210,12 +212,18 @@ oRun := ioEngStruct.State.RunOut;
       <LineId Id="159" Count="1" />
       <LineId Id="164" Count="1" />
       <LineId Id="699" Count="1" />
-      <LineId Id="862" Count="14" />
+      <LineId Id="862" Count="0" />
+      <LineId Id="865" Count="0" />
+      <LineId Id="868" Count="0" />
+      <LineId Id="900" Count="1" />
+      <LineId Id="871" Count="1" />
+      <LineId Id="902" Count="0" />
+      <LineId Id="873" Count="0" />
       <LineId Id="180" Count="0" />
       <LineId Id="161" Count="0" />
       <LineId Id="190" Count="1" />
       <LineId Id="194" Count="1" />
-      <LineId Id="701" Count="3" />
+      <LineId Id="701" Count="1" />
       <LineId Id="201" Count="0" />
       <LineId Id="735" Count="1" />
       <LineId Id="741" Count="0" />

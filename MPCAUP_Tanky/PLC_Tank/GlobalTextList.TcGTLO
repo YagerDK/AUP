@@ -41,6 +41,16 @@
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
+              <v n="TextID">"893"</v>
+              <v n="TextDefault">"Mixer Engine"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
+              <v n="TextID">"606"</v>
+              <v n="TextDefault">"Mixing"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
               <v n="TextID">"604"</v>
               <v n="TextDefault">"Open"</v>
               <l n="LanguageTexts" t="ArrayList" />
@@ -56,8 +66,18 @@
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
+              <v n="TextID">"415"</v>
+              <v n="TextDefault">"Start"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
               <v n="TextID">"835"</v>
               <v n="TextDefault">"Start mixing"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
+              <v n="TextID">"956"</v>
+              <v n="TextDefault">"Stop"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
