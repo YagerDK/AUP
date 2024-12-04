@@ -25,9 +25,9 @@ pidParameters.tCtrlCycleTime := T#200MS;
 pidParameters.tTaskCycleTime := T#100MS;
 pidParameters.fOutMaxLimit := 100;
 pidParameters.fOutMinLimit := 0;
-pidParameters.bDInTheFeedbackPath := FALSE;
-pidParameters.bPInTheFeedbackPath := FALSE;
-pidParameters.bARWOnIPartOnly := FALSE;
+pidParameters.bDInTheFeedbackPath := TRUE;
+pidParameters.bPInTheFeedbackPath := TRUE;
+pidParameters.bARWOnIPartOnly := TRUE;
 pidParameters.tTd := T#100MS; 
 
 ioHeatStruct.PID(
@@ -38,7 +38,7 @@ ioHeatStruct.PID(
 	eMode := E_CTRL_MODE.eCTRL_MODE_ACTIVE, // automatic mode of PID component
 	stParams := pidParameters);
 
-ioHeatStruct.State.HeatingOut := ioHeatStruct.PID.fOut;
+ioHeatStruct.State.HeatingOut := ioHeatStruct.PID.fOut; // ZDE SE "NASTAVUJE" VYKON TOPENI
 
 	 
 {region "Manual/Automat"}
@@ -73,6 +73,8 @@ IF ioHeatStruct.Cmd.AutCtrl THEN
 
 	 IF ioHeatStruct.Cmd.TurnOnMan AND ioHeatStruct.State.ManCtrl THEN
 		ioHeatStruct.State.EnableOut := TRUE; 
+		ioHeatStruct.State.HeatingOut := 10;
+		ioHeatStruct.State.HeatingPower := 10;
 	ELSIF ioHeatStruct.Cmd.TurnOffMan AND ioHeatStruct.State.ManCtrl THEN
 		ioHeatStruct.State.EnableOut := FALSE; 
 	END_IF
@@ -132,7 +134,9 @@ oHeaterEnable := ioHeatStruct.State.EnableOut;]]></ST>
       <LineId Id="159" Count="1" />
       <LineId Id="337" Count="1" />
       <LineId Id="461" Count="0" />
-      <LineId Id="463" Count="7" />
+      <LineId Id="463" Count="1" />
+      <LineId Id="570" Count="1" />
+      <LineId Id="465" Count="5" />
       <LineId Id="180" Count="0" />
       <LineId Id="462" Count="0" />
       <LineId Id="161" Count="0" />
