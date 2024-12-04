@@ -18,7 +18,21 @@ END_VAR
     <Implementation>
       <ST><![CDATA[{region "Aut/Man"}
     // switching state of engine - automatic or manual control (default state is manual)
-  
+	
+	IF NOT DrainingPhase.Cmd.AutCtrl AND NOT DrainingPhase.State.ManCtrl THEN
+		DrainingPhase.State.ManCtrl := TRUE;
+	END_IF;
+
+	IF DrainingPhase.Cmd.AutCtrl THEN
+		DrainingPhase.State.AutCtrl := TRUE;
+		DrainingPhase.State.ManCtrl := FALSE;
+	END_IF;
+	
+	IF DrainingPhase.Cmd.ManCtrl THEN
+		DrainingPhase.State.ManCtrl := TRUE;
+		DrainingPhase.State.AutCtrl := FALSE;
+	END_IF;
+	
 {endregion}
 
 {region "ManCtrl"}
@@ -29,23 +43,87 @@ END_VAR
     // Pause - close draining valve
     // Resume - open draining valve
     // real states of phase are writed into states in phase structure
-  
+		 
+	IF DrainingPhase.State.ManCtrl THEN
+		IF DrainingPhase.Cmd.StartMan AND DrainingPhase.State.Idle THEN
+			DrainingPhase.State.Running := TRUE;
+			DrainingPhase.State.Paused := FALSE;
+			DrainingPhase.State.Idle := FALSE;
+			DrainingPhase.State.Done := FALSE;
+		END_IF;
+	
+		IF DrainingPhase.Cmd.PauseMan AND DrainingPhase.State.Running THEN
+			DrainingPhase.State.Running := FALSE;
+			DrainingPhase.State.Paused := TRUE;
+			DrainingPhase.State.Idle := FALSE;
+			DrainingPhase.State.Done := FALSE;
+		END_IF;
+	
+		IF DrainingPhase.Cmd.ResumeMan AND DrainingPhase.State.Paused THEN
+			DrainingPhase.State.Running := TRUE;
+			DrainingPhase.State.Paused := FALSE;
+			DrainingPhase.State.Idle := FALSE;
+			DrainingPhase.State.Done := FALSE;
+		END_IF;
+	
+		IF DrainingPhase.Cmd.StopMan AND (DrainingPhase.State.Paused OR DrainingPhase.State.Running) THEN
+			DrainingPhase.State.Running := FALSE;
+			DrainingPhase.State.Paused := FALSE;
+			DrainingPhase.State.Idle := TRUE;
+			DrainingPhase.State.Done := FALSE;
+		END_IF;
+	
+		DrainingPhase.Cmd.StartMan := FALSE;
+		DrainingPhase.Cmd.PauseMan := FALSE;
+		DrainingPhase.Cmd.ResumeMan := FALSE;
+		DrainingPhase.Cmd.StopMan := FALSE;
+	END_IF;
 {endregion}
 
 {region "AutCtrl"}
     //if request to run in automatic mode -> set auto request to open of filling valve to 1 and close to 0, if not open 0 close 1
     // commands should be sets to false after their processing
-   
+	IF DrainingPhase.State.AutCtrl THEN
+		IF DrainingPhase.Cmd.StartAut AND DrainingPhase.State.Idle THEN
+			DrainingPhase.State.Running := TRUE;
+			DrainingPhase.State.Idle := FALSE;
+		END_IF;
+	
+		IF DrainingPhase.Cmd.StopAut AND DrainingPhase.State.Running THEN
+			DrainingPhase.State.Idle := TRUE;
+			DrainingPhase.State.Running := FALSE;
+		END_IF;
+	
+		DrainingPhase.Cmd.StartAut := FALSE;
+		DrainingPhase.Cmd.StopAut := FALSE;
+	END_IF;
 {endregion}
 {region "Done"}
     //every phase should have finish condition - draining phase - if water level is below requested level
     //after that done state should be setted to 1
-   
+   IF DrainingPhase.WaterLevel <= DrainingPhase.ParamDrainLevel THEN
+		DrainingPhase.Cmd.StopAut := TRUE; // ?? Are you sure about that?
+		DrainingPhase.Cmd.StopMan := TRUE;
+		DrainingPhase.State.Done := TRUE;
+	END_IF;
+	
+	IF DrainingPhase.Cmd.ResetDone THEN
+		DrainingPhase.State.Done := FALSE;
+		DrainingPhase.Cmd.ResetDone := FALSE;
+	END_IF;
 {endregion}
 
 {region "States"} 
     //Command valve in cases of states
-   
+   	IF DrainingPhase.State.Running THEN
+		DrainingValve.Cmd.Req2OpenAut := TRUE;
+		DrainingValve.Cmd.Req2CloseAut := FALSE;
+	END_IF;
+	
+	IF DrainingPhase.State.Idle OR DrainingPhase.State.Paused THEN
+		DrainingValve.Cmd.Req2CloseAut := TRUE;
+		DrainingValve.Cmd.Req2OpenAut := FALSE;
+	END_IF;
 {endregion}
 
 // delault state of phase - if not any state sets state to idle
@@ -67,11 +145,36 @@ doEnabled := diEnabled;]]></ST>
     </Implementation>
     <LineIds Name="Draining">
       <LineId Id="10" Count="1" />
+      <LineId Id="179" Count="0" />
+      <LineId Id="197" Count="1" />
+      <LineId Id="194" Count="1" />
+      <LineId Id="193" Count="0" />
+      <LineId Id="180" Count="1" />
+      <LineId Id="183" Count="4" />
+      <LineId Id="189" Count="0" />
       <LineId Id="24" Count="10" />
-      <LineId Id="76" Count="5" />
+      <LineId Id="199" Count="0" />
+      <LineId Id="201" Count="2" />
+      <LineId Id="229" Count="0" />
+      <LineId Id="204" Count="4" />
+      <LineId Id="230" Count="2" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="211" Count="2" />
+      <LineId Id="233" Count="2" />
+      <LineId Id="214" Count="0" />
+      <LineId Id="216" Count="2" />
+      <LineId Id="236" Count="2" />
+      <LineId Id="222" Count="6" />
+      <LineId Id="200" Count="0" />
+      <LineId Id="77" Count="4" />
+      <LineId Id="252" Count="0" />
+      <LineId Id="240" Count="11" />
       <LineId Id="95" Count="0" />
       <LineId Id="97" Count="3" />
+      <LineId Id="253" Count="5" />
+      <LineId Id="260" Count="2" />
       <LineId Id="112" Count="4" />
+      <LineId Id="272" Count="7" />
       <LineId Id="123" Count="1" />
       <LineId Id="126" Count="0" />
       <LineId Id="154" Count="11" />
