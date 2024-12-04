@@ -37,15 +37,22 @@ END_VAR
 	
 	IF ioValStruct.Cmd.AutCtrl THEN
 		ioValStruct.State.AutCtrl := TRUE;
-		ioValStruct.State.ManCtrl := FALSE;
-	ELSE
+		ioValStruct.State.ManCtrl := FALSE;	 
+	END_IF
+		 
+	IF ioValStruct.Cmd.ManCtrl THEN
 		ioValStruct.State.AutCtrl := FALSE;
 		ioValStruct.State.ManCtrl := TRUE;
-	END_IF
+	END_IF;
+		 
+	IF NOT ioValStruct.State.AutCtrl AND NOT ioValStruct.State.ManCtrl THEN
+		ioValStruct.State.ManCtrl := TRUE;
+		ioValStruct.State.AutCtrl := FALSE;
+	END_IF;
 		 
 	// vynulovani obou prikazu
 	ioValStruct.Cmd.AutCtrl := FALSE;
-	ioValStruct.Cmd.ManCtrl := FALSE; 
+	ioValStruct.Cmd.ManCtrl := FALSE;
 			  
 {endregion}
 	 
@@ -174,8 +181,9 @@ oClose := ioValStruct.State.CloseOut;
       <LineId Id="9" Count="0" />
       <LineId Id="103" Count="0" />
       <LineId Id="109" Count="0" />
-      <LineId Id="473" Count="9" />
-      <LineId Id="471" Count="1" />
+      <LineId Id="531" Count="16" />
+      <LineId Id="530" Count="0" />
+      <LineId Id="472" Count="0" />
       <LineId Id="71" Count="0" />
       <LineId Id="126" Count="1" />
       <LineId Id="329" Count="0" />
