@@ -3,102 +3,14 @@
   <POU Name="MAIN" Id="{1ebefdd1-3e03-4aac-b0d7-9cb2e38b8084}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
-    // Instance funkčního bloku Filling
-    fbFilling : Filling;
-	fbMixing : Mixing;
-	MixingPhase : TPhaseMixing;
-	MixerEng : TEngine;
-	
-	//pokus
-	
-	mix : Engine_1DO;
-	
-    // Struktura fáze Filling
-    fillingPhase : TPhaseFilling;
 
-    // Struktura ventilu
-    fillingValve : TValve;
-
-    // Globální časový impuls
-    secImp : BOOL;
-	
-	currentState : INT; // Aktuální stav automatu
-    nextState : INT;    // Následující stav
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[
-
-// Generování časového impulsu,
-Global.secImp := NOT(Global.secImp);
-
-// Stavový automat
-CASE currentState OF
-    0: // Stav 0 - Nic
-        // Inicializace parametrů
-        fillingPhase.ParamFillLevel := 1.0; // Nastavení cílové hladiny
-        nextState := 1;
-
-    1: // Stav 1 - Napouštění
-        // Volání funkčního bloku Filling
-//        fbFilling(
-//            diEnabled := TRUE,               // Aktivace fáze
-//            doEnabled => ,                   // Výstupní parametr
-//            FillingPhase := fillingPhase,    // IN_OUT parametr
-//            FillingValve := fillingValve     // IN_OUT parametr
-//        );
-		
-//		fbMixing(diEnabled := TRUE,
-//			iSecImp := Global.secImp,
-//			isManual := TRUE,
-//			doEnabled =>,
-//			MixingPhase := MixingPhase,
-//			MixerEng := MixerEng);
-			
-			//mix(iRunning:= TRUE, iError := FALSE, iSecImp := Global.SecImp,oRun=>,ioHeatStruct:=MixerEng);
-
-        // Kontrola dokončení fáze
-        IF fillingPhase.State.Done THEN
-            nextState := 2; // Přechod do další fáze
-        END_IF;
-		
-//		Global.Tank1.Mixing.Cmd.ManCtrl := TRUE;
-//		Global.Tank1.Mixing.Cmd.StartMan := TRUE;
-//		Global.Tank1.Mixing.State.ManCtrl := TRUE;
-//		Global.Tank1.Mixing.State.Running := TRUE;
-		
-
-    2: // Stav 2 - Zahřívání
-        // Logika zahřívání zde
-        // Předpokládáme přechod do dalšího stavu po určitém čase nebo podmínce
-        nextState := 3;
-
-    3: // Stav 3 - Homogenizace
-        // Logika homogenizace zde
-        nextState := 4;
-
-    4: // Stav 4 - Odpouštění
-        // Logika odpouštění zde
-        nextState := 0; // Návrat do výchozího stavu
-
-    ELSE
-        // Výchozí stav při chybě
-        nextState := 0;
-END_CASE;
-
-// Aktualizace aktuálního stavu
-currentState := nextState;
 ]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
-      <LineId Id="949" Count="19" />
-      <LineId Id="1012" Count="5" />
-      <LineId Id="1020" Count="0" />
-      <LineId Id="1044" Count="1" />
-      <LineId Id="969" Count="4" />
-      <LineId Id="1046" Count="1" />
-      <LineId Id="1052" Count="2" />
-      <LineId Id="1050" Count="0" />
-      <LineId Id="974" Count="20" />
+      <LineId Id="994" Count="0" />
       <LineId Id="368" Count="0" />
     </LineIds>
   </POU>

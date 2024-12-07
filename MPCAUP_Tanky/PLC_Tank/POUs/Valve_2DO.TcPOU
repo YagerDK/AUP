@@ -116,10 +116,10 @@ END_VAR
     // calculating start up fail - if output is sets to open or close, it's expected feedback from limit sensor in defined time, if feedback doesn't show in this time, it should be start up fail error
     // merge of these two error is general error
     // error is both inputs (open and closed) true state
-    ioValStruct.OpenFailTimer(IN := (ioValStruct.State.OpenOut AND (NOT ioValStruct.State.CloseOut)), PT := ioValStruct.Time2Open);
+    ioValStruct.OpenFailTimer(IN := FALSE, PT := ioValStruct.Time2Open);
 	tempOpenStartupFail := ioValStruct.OpenFailTimer.Q;
 
-    ioValStruct.CloseFailTimer(IN := ((NOT ioValStruct.State.OpenOut) AND ioValStruct.State.CloseOut), PT := ioValStruct.Time2Open);
+    ioValStruct.CloseFailTimer(IN := FALSE, PT := ioValStruct.Time2Open);
 	tempCloseStartupFail := ioValStruct.CloseFailTimer.Q;
     
    

@@ -13,10 +13,7 @@ VAR_IN_OUT
     FillingValve : TValve;       // Struktura ventilu
 END_VAR
 VAR
-    fbDO : Valve_2DO;            // Instance funkčního bloku Valve_2DO
-    fbRawToEng : RawToEng;       // Instance funkčního bloku RawToEng
-    analogConversion : TAnalogConversion; // Parametry pro převod
-    scaledWaterLevel : REAL;     // Aktuální hladina vody
+
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[{region "REGION Aut/Man"}
@@ -24,12 +21,14 @@ END_VAR]]></Declaration>
 	IF FillingPhase.Cmd.AutCtrl THEN
 			FillingPhase.State.AutCtrl := TRUE;
         	FillingPhase.State.ManCtrl := FALSE;
-        	FillingPhase.Cmd.AutCtrl := FALSE; //mozna navic
+			FillingValve.Cmd.AutCtrl := TRUE;
+        	//FillingPhase.Cmd.AutCtrl := FALSE; //mozna navic
     	END_IF;
     IF FillingPhase.Cmd.ManCtrl THEN
+			FillingPhase.State.ManCtrl := TRUE;
         	FillingPhase.State.AutCtrl := FALSE;
-       		FillingPhase.State.ManCtrl := TRUE;
-       		FillingPhase.Cmd.ManCtrl := FALSE; //mozna navic
+			FillingValve.Cmd.ManCtrl := TRUE;
+       		//FillingPhase.Cmd.ManCtrl := FALSE; //mozna navic
     END_IF;
     IF NOT FillingPhase.State.AutCtrl AND NOT FillingPhase.State.ManCtrl THEN
         		FillingPhase.State.ManCtrl := TRUE;
@@ -50,7 +49,7 @@ END_VAR]]></Declaration>
          IF FillingPhase.Cmd.StartMan AND FillingPhase.State.Idle THEN
              	FillingPhase.State.Running := TRUE;
              	FillingPhase.State.Idle := FALSE;
-            	 FillingPhase.State.Done := FALSE;
+            	FillingPhase.State.Done := FALSE;
         	 END_IF;
          IF FillingPhase.Cmd.PauseMan AND FillingPhase.State.Running THEN
             	 FillingPhase.State.Paused := TRUE;
@@ -97,7 +96,8 @@ END_VAR]]></Declaration>
     //every phase should have finish condition - filling phase - if water level is above requested level
     //after that done state should be setted to 1
    IF FillingPhase.WaterLevel >= FillingPhase.ParamFillLevel THEN
-        	FillingPhase.Cmd.StopMan := TRUE;
+        	FillingPhase.Cmd.StopAut := TRUE;
+			FillingPhase.Cmd.StopMan := TRUE;
         	FillingPhase.State.Done := TRUE;
     END_IF;
     // command reset done resets done state and than resets command
@@ -110,6 +110,7 @@ END_VAR]]></Declaration>
 {region "States"} 
     //Command valve in cases of states
 	IF FillingPhase.State.Running THEN
+			//FillingValve.Cmd.AutCtrl := TRUE;
         	FillingValve.Cmd.Req2OpenAut := TRUE;
         	FillingValve.Cmd.Req2CloseAut := FALSE;
     END_IF;
@@ -141,17 +142,28 @@ doEnabled := diEnabled;]]></ST>
       <LineId Id="789" Count="1" />
       <LineId Id="846" Count="0" />
       <LineId Id="859" Count="0" />
-      <LineId Id="848" Count="10" />
+      <LineId Id="848" Count="0" />
+      <LineId Id="1021" Count="0" />
+      <LineId Id="849" Count="2" />
+      <LineId Id="999" Count="0" />
+      <LineId Id="852" Count="0" />
+      <LineId Id="1022" Count="0" />
+      <LineId Id="853" Count="0" />
+      <LineId Id="855" Count="3" />
       <LineId Id="791" Count="11" />
       <LineId Id="929" Count="25" />
       <LineId Id="803" Count="0" />
       <LineId Id="809" Count="5" />
       <LineId Id="955" Count="10" />
       <LineId Id="815" Count="5" />
-      <LineId Id="966" Count="1" />
+      <LineId Id="1001" Count="0" />
+      <LineId Id="967" Count="0" />
+      <LineId Id="1002" Count="0" />
       <LineId Id="969" Count="5" />
       <LineId Id="821" Count="4" />
-      <LineId Id="975" Count="6" />
+      <LineId Id="975" Count="0" />
+      <LineId Id="998" Count="0" />
+      <LineId Id="976" Count="5" />
       <LineId Id="826" Count="18" />
       <LineId Id="9" Count="0" />
     </LineIds>
