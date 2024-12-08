@@ -19,7 +19,9 @@ iR_TRIG : R_TRIG;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[{region "Aut/Man"}
+      <ST><![CDATA[
+
+{region "Aut/Man"}
 // Přepínání mezi automatickým a manuálním režimem
 IF MixingPhase.Cmd.AutCtrl THEN
     MixingPhase.State.AutCtrl := TRUE;
@@ -39,35 +41,34 @@ END_IF;
 {endregion}
 
 {region "ManCtrl"}
-// Zpracování manuálních akcí
+// Manuální režim
 IF MixingPhase.State.ManCtrl THEN
     IF MixingPhase.Cmd.StartMan AND MixingPhase.State.Idle THEN
         MixingPhase.State.Running := TRUE;
         MixingPhase.State.Idle := FALSE;
         MixingPhase.State.Paused := FALSE;
         MixingPhase.State.Done := FALSE;
-		MixerEng.Cmd.TurnOnMan := TRUE;
+        MixerEng.Cmd.TurnOnMan := TRUE; // Spuštění motoru v manuálním režimu
     END_IF;
 
     IF MixingPhase.Cmd.PauseMan AND MixingPhase.State.Running THEN
         MixingPhase.State.Paused := TRUE;
         MixingPhase.State.Running := FALSE;
-        MixingPhase.State.Idle := FALSE;
-        MixingPhase.State.Done := FALSE;
-		
+        MixerEng.Cmd.TurnOffMan := TRUE; // Zastavení motoru
     END_IF;
 
     IF MixingPhase.Cmd.ResumeMan AND MixingPhase.State.Paused THEN
         MixingPhase.State.Running := TRUE;
         MixingPhase.State.Paused := FALSE;
-        MixingPhase.State.Done := FALSE;
+        MixerEng.Cmd.TurnOnMan := TRUE; // Znovu spuštění motoru
     END_IF;
 
-    IF MixingPhase.Cmd.StopMan AND (MixingPhase.State.Paused OR MixingPhase.State.Running) THEN
+    IF MixingPhase.Cmd.StopMan AND (MixingPhase.State.Running OR MixingPhase.State.Paused) THEN
         MixingPhase.State.Idle := TRUE;
         MixingPhase.State.Paused := FALSE;
         MixingPhase.State.Running := FALSE;
         MixingPhase.State.Done := FALSE;
+        MixerEng.Cmd.TurnOffMan := TRUE; // Zastavení motoru
     END_IF;
 
     MixingPhase.Cmd.StartMan := FALSE;
@@ -83,11 +84,13 @@ IF MixingPhase.State.AutCtrl THEN
     IF MixingPhase.Cmd.StartAut AND MixingPhase.State.Idle THEN
         MixingPhase.State.Running := TRUE;
         MixingPhase.State.Idle := FALSE;
+        MixerEng.Cmd.Req2RunAutCtrl := TRUE; // Požadavek na automatické spuštění motoru
     END_IF;
 
     IF MixingPhase.Cmd.StopAut AND MixingPhase.State.Running THEN
         MixingPhase.State.Idle := TRUE;
         MixingPhase.State.Running := FALSE;
+        MixerEng.Cmd.Req2RunAutCtrl := FALSE; // Požadavek na zastavení motoru
     END_IF;
 
     MixingPhase.Cmd.StartAut := FALSE;
@@ -118,7 +121,7 @@ END_IF;
 {endregion}
 
 {region "States"}
-// Příkazy motoru pro jednotlivé stavy
+// Řízení motoru podle stavů
 IF MixingPhase.State.Running THEN
     MixerEng.Cmd.Req2RunAutCtrl := TRUE;
 END_IF;
@@ -146,11 +149,7 @@ doEnabled := diEnabled;
 ]]></ST>
     </Implementation>
     <LineIds Name="Mixing">
-      <LineId Id="407" Count="26" />
-      <LineId Id="529" Count="0" />
-      <LineId Id="434" Count="6" />
-      <LineId Id="530" Count="0" />
-      <LineId Id="441" Count="87" />
+      <LineId Id="566" Count="126" />
       <LineId Id="166" Count="0" />
     </LineIds>
   </POU>

@@ -4,7 +4,6 @@
     <Declaration><![CDATA[FUNCTION_BLOCK Heater
 VAR_INPUT
 	iWaterTemp : REAL;
-	maxWaterTemp: REAL; // pridano TM
 END_VAR
 VAR_OUTPUT
 	oHeaterEnable : BOOL;
@@ -14,144 +13,110 @@ VAR_IN_OUT
 	ioHeatStruct : THeater;
 END_VAR
 VAR
-	pidParameters : ST_CTRL_PID_PARAMS;
+	pidParameters : ST_CTRL_PID_PARAMS; 
+
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[pidParameters.fKp := 10; //P
-pidParameters.tTn := T#2S; //I
-pidParameters.tTv := T#0.5S; //D
+      <ST><![CDATA[
+// Nastavení PID parametrů
+pidParameters.fKp := 10.0;
+pidParameters.tTn := T#2S;
+pidParameters.tTv := T#0.5S;
 pidParameters.tCtrlCycleTime := T#200MS;
 pidParameters.tTaskCycleTime := T#100MS;
-pidParameters.fOutMaxLimit := 100;
-pidParameters.fOutMinLimit := 0;
-pidParameters.bDInTheFeedbackPath := FALSE;
-pidParameters.bPInTheFeedbackPath := FALSE;
-pidParameters.bARWOnIPartOnly := FALSE;
-pidParameters.tTd := T#100MS; 
+pidParameters.fOutMaxLimit := 100.0;
+pidParameters.fOutMinLimit := 0.0;
 
+// PID regulátor
 ioHeatStruct.PID(
-	fSetpointValue := ioHeatStruct.ParamHeatingSetPointAutomat, 
-	fActualValue := iWaterTemp, 
-	fManSyncValue := ioHeatStruct.ParamHeatingPowerManual,
-	bSync := ioHeatStruct.State.ManCtrl,
-	eMode := E_CTRL_MODE.eCTRL_MODE_ACTIVE, // automatic mode of PID component
-	stParams := pidParameters);
+    fSetpointValue := ioHeatStruct.ParamHeatingSetPointAutomat,
+    fActualValue := iWaterTemp,
+    fManSyncValue := ioHeatStruct.ParamHeatingPowerManual,
+    bSync := ioHeatStruct.State.ManCtrl,
+    eMode := E_CTRL_MODE.eCTRL_MODE_ACTIVE,
+    stParams := pidParameters
+);
 
 ioHeatStruct.State.HeatingOut := ioHeatStruct.PID.fOut;
 
-	 
-{region "Manual/Automat"}
-// switching state of engine - automatic or manual control (default state is manual)
-	
-IF ioHeatStruct.Cmd.AutCtrl THEN
-		ioHeatStruct.State.AutCtrl := TRUE;
-		ioHeatStruct.State.ManCtrl := FALSE;	 
-	END_IF
-		 
-	IF ioHeatStruct.Cmd.ManCtrl THEN
-		ioHeatStruct.State.AutCtrl := FALSE;
-		ioHeatStruct.State.ManCtrl := TRUE;
-	END_IF;
-		 
-	IF NOT ioHeatStruct.State.AutCtrl AND NOT ioHeatStruct.State.ManCtrl THEN
-		ioHeatStruct.State.ManCtrl := TRUE;
-		ioHeatStruct.State.AutCtrl := FALSE;
-	END_IF;
-		 
-	// vynulovani obou prikazu
-	ioHeatStruct.Cmd.AutCtrl := FALSE;
-	ioHeatStruct.Cmd.ManCtrl := FALSE;
-{endregion}
-	
-{endregion}
-	 
- 
-{region "ManCtrl"}
-// processing manual actions - if command is processed, it is set to FALSE even if can't be processed
-// Engine commands are turn off (stop) and turn on (start)
-
-	 IF ioHeatStruct.Cmd.TurnOnMan AND ioHeatStruct.State.ManCtrl THEN
-		ioHeatStruct.State.EnableOut := TRUE; 
-	ELSIF ioHeatStruct.Cmd.TurnOffMan AND ioHeatStruct.State.ManCtrl THEN
-		ioHeatStruct.State.EnableOut := FALSE; 
-	END_IF
-		 
-	// vynulovani obou prikazu
-	ioHeatStruct.Cmd.TurnOnMan := FALSE;
-	ioHeatStruct.Cmd.TurnOffMan := FALSE;
-		  
-{endregion}
- 
-{region "AutCtrl"}
-//if request to run in automatic mode set outputs to right states if MAR
-//AutoRequest shouldn't be reseted to false state
-   IF ioHeatStruct.State.AutCtrl THEN //?????
-		ioHeatStruct.State.EnableOut := ioHeatStruct.Cmd.Req2RunAutCtrl; 
-	END_IF
-		 
-{endregion}
- 
-{region "Error states"}
-// if water temperature is too high, stop heating and generate error
-IF iWaterTemp > maxWaterTemp THEN
-	ioHeatStruct.State.Err := TRUE;
-	ioHeatStruct.State.GenErr := TRUE; 
-END_IF
-{endregion}
-	 
- 
+// Řízení ohřívače
+oHeaterEnable := ioHeatStruct.State.EnableOut;
 oHeaterPower := ioHeatStruct.State.HeatingOut;
-oHeaterEnable := ioHeatStruct.State.EnableOut;]]></ST>
+
+{region "Manual/Automat"}
+// Přepínání mezi manuálním a automatickým režimem
+IF ioHeatStruct.Cmd.AutCtrl THEN
+    ioHeatStruct.State.AutCtrl := TRUE;
+    ioHeatStruct.State.ManCtrl := FALSE;
+END_IF;
+
+IF ioHeatStruct.Cmd.ManCtrl THEN
+    ioHeatStruct.State.AutCtrl := FALSE;
+    ioHeatStruct.State.ManCtrl := TRUE;
+END_IF;
+
+IF NOT ioHeatStruct.State.AutCtrl AND NOT ioHeatStruct.State.ManCtrl THEN
+    ioHeatStruct.State.ManCtrl := TRUE;
+END_IF;
+
+// Reset příkazů
+ioHeatStruct.Cmd.AutCtrl := FALSE;
+ioHeatStruct.Cmd.ManCtrl := FALSE;
+{endregion}
+
+{region "ManCtrl"}
+// Manuální režim - ruční ovládání ohřívače
+IF ioHeatStruct.State.ManCtrl THEN
+    IF ioHeatStruct.Cmd.TurnOnMan THEN
+        ioHeatStruct.State.EnableOut := TRUE;
+    END_IF;
+
+    IF ioHeatStruct.Cmd.TurnOffMan THEN
+        ioHeatStruct.State.EnableOut := FALSE;
+    END_IF;
+
+    // Reset manuálních příkazů
+    ioHeatStruct.Cmd.TurnOnMan := FALSE;
+    ioHeatStruct.Cmd.TurnOffMan := FALSE;
+END_IF;
+{endregion}
+
+{region "AutCtrl"}
+// Automatický režim - řízení ohřívače podle požadavku
+IF ioHeatStruct.State.AutCtrl THEN
+    ioHeatStruct.State.EnableOut := ioHeatStruct.Cmd.Req2RunAutCtrl;
+END_IF;
+
+// Reset automatického požadavku
+ioHeatStruct.Cmd.Req2RunAutCtrl := FALSE;
+{endregion}
+
+{region "Error states"}
+// Kontrola chyb - překročení maximální teploty
+IF iWaterTemp > Global.maxWaterTemp THEN
+    ioHeatStruct.State.Err := TRUE;
+    ioHeatStruct.State.GenErr := TRUE;
+    ioHeatStruct.State.EnableOut := FALSE;
+END_IF;
+{endregion}
+
+{region "StatusInt"}
+// Vizualizace stavů
+IF NOT ioHeatStruct.State.GenErr THEN
+    IF ioHeatStruct.State.EnableOut THEN
+        ioHeatStruct.State.StateInt := Global.Running;
+    ELSE
+        ioHeatStruct.State.StateInt := Global.Stop;
+    END_IF;
+ELSE
+    ioHeatStruct.State.StateInt := Global.Err;
+END_IF;
+{endregion}
+]]></ST>
     </Implementation>
     <LineIds Name="Heater">
-      <LineId Id="382" Count="1" />
-      <LineId Id="372" Count="0" />
-      <LineId Id="385" Count="0" />
-      <LineId Id="387" Count="0" />
-      <LineId Id="386" Count="0" />
-      <LineId Id="388" Count="4" />
-      <LineId Id="384" Count="0" />
-      <LineId Id="370" Count="0" />
-      <LineId Id="374" Count="0" />
-      <LineId Id="373" Count="0" />
-      <LineId Id="375" Count="2" />
-      <LineId Id="380" Count="0" />
-      <LineId Id="394" Count="0" />
-      <LineId Id="393" Count="0" />
-      <LineId Id="40" Count="0" />
-      <LineId Id="54" Count="0" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="321" Count="0" />
-      <LineId Id="451" Count="0" />
-      <LineId Id="537" Count="17" />
-      <LineId Id="536" Count="0" />
-      <LineId Id="109" Count="0" />
-      <LineId Id="71" Count="0" />
-      <LineId Id="126" Count="0" />
-      <LineId Id="159" Count="1" />
-      <LineId Id="337" Count="1" />
-      <LineId Id="461" Count="0" />
-      <LineId Id="463" Count="7" />
-      <LineId Id="180" Count="0" />
-      <LineId Id="462" Count="0" />
-      <LineId Id="161" Count="0" />
-      <LineId Id="190" Count="1" />
-      <LineId Id="349" Count="1" />
-      <LineId Id="471" Count="1" />
-      <LineId Id="475" Count="0" />
-      <LineId Id="201" Count="0" />
-      <LineId Id="192" Count="0" />
-      <LineId Id="202" Count="1" />
-      <LineId Id="354" Count="0" />
-      <LineId Id="436" Count="0" />
-      <LineId Id="476" Count="0" />
-      <LineId Id="478" Count="0" />
-      <LineId Id="477" Count="0" />
-      <LineId Id="204" Count="0" />
-      <LineId Id="434" Count="0" />
-      <LineId Id="256" Count="0" />
-      <LineId Id="358" Count="0" />
+      <LineId Id="772" Count="94" />
       <LineId Id="260" Count="0" />
     </LineIds>
   </POU>
