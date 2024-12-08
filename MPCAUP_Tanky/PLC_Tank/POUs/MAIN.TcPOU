@@ -3,14 +3,52 @@
   <POU Name="MAIN" Id="{1ebefdd1-3e03-4aac-b0d7-9cb2e38b8084}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
+	
+current_state : INT;
+next_state : INT;
+start_process : BOOL;
 
-END_VAR]]></Declaration>
+END_VAR
+]]></Declaration>
     <Implementation>
       <ST><![CDATA[
-]]></ST>
+CASE Current_state OF
+	0: // Init
+		IF start_process THEN
+			Global.Tank1.Filling.ParamFillLevel := 1;
+			Global.Tank1.Draining.ParamDrainLevel := 0;
+			Global.Tank1.Filling.Cmd.ResetDone := TRUE;
+			//start_process := FALSE;
+			next_state := 1;
+		ELSE
+			next_state := 0;
+		END_IF;
+		
+		
+	1: // Filling
+		Global.Tank1.Filling.Cmd.StartAut := TRUE;
+		IF Global.Tank1.Filling.State.Done THEN
+			next_state := 2;
+		END_IF;
+		
+	2: //Draining
+		Global.Tank1.Draining.Cmd.ResetDone := TRUE;
+		Global.Tank1.Draining.Cmd.StartAut := TRUE;
+		IF Global.Tank1.Draining.State.Done THEN
+			next_state := 3;
+		END_IF;
+		
+		
+	
+END_CASE;
+current_state := next_state;]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
       <LineId Id="994" Count="0" />
+      <LineId Id="1004" Count="5" />
+      <LineId Id="1011" Count="13" />
+      <LineId Id="1033" Count="0" />
+      <LineId Id="1025" Count="7" />
       <LineId Id="368" Count="0" />
     </LineIds>
   </POU>
