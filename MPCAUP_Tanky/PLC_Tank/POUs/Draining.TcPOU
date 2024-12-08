@@ -19,18 +19,20 @@ END_VAR
       <ST><![CDATA[{region "Aut/Man"}
     // switching state of engine - automatic or manual control (default state is manual)
 	
-	IF NOT DrainingPhase.Cmd.AutCtrl AND NOT DrainingPhase.State.ManCtrl THEN
-		DrainingPhase.State.ManCtrl := TRUE;
-	END_IF;
-
 	IF DrainingPhase.Cmd.AutCtrl THEN
-		DrainingPhase.State.AutCtrl := TRUE;
-		DrainingPhase.State.ManCtrl := FALSE;
+			DrainingPhase.State.AutCtrl := TRUE;
+			DrainingPhase.State.ManCtrl := FALSE;
+			DrainingValve.Cmd.AutCtrl := TRUE;
 	END_IF;
 	
 	IF DrainingPhase.Cmd.ManCtrl THEN
-		DrainingPhase.State.ManCtrl := TRUE;
-		DrainingPhase.State.AutCtrl := FALSE;
+			DrainingPhase.State.ManCtrl := TRUE;
+			DrainingPhase.State.AutCtrl := FALSE;
+			DrainingValve.Cmd.ManCtrl := TRUE;
+	END_IF;
+		 
+	IF NOT DrainingPhase.Cmd.AutCtrl AND NOT DrainingPhase.State.ManCtrl THEN
+			DrainingPhase.State.ManCtrl := TRUE;
 	END_IF;
 	
 {endregion}
@@ -53,8 +55,8 @@ END_VAR
 		END_IF;
 	
 		IF DrainingPhase.Cmd.PauseMan AND DrainingPhase.State.Running THEN
-			DrainingPhase.State.Running := FALSE;
 			DrainingPhase.State.Paused := TRUE;
+			DrainingPhase.State.Running := FALSE;
 			DrainingPhase.State.Idle := FALSE;
 			DrainingPhase.State.Done := FALSE;
 		END_IF;
@@ -102,7 +104,7 @@ END_VAR
     //every phase should have finish condition - draining phase - if water level is below requested level
     //after that done state should be setted to 1
    IF DrainingPhase.WaterLevel <= DrainingPhase.ParamDrainLevel THEN
-		DrainingPhase.Cmd.StopAut := TRUE; // ?? Are you sure about that?
+		DrainingPhase.Cmd.StopAut := TRUE;
 		DrainingPhase.Cmd.StopMan := TRUE;
 		DrainingPhase.State.Done := TRUE;
 	END_IF;
@@ -146,18 +148,22 @@ doEnabled := diEnabled;]]></ST>
     <LineIds Name="Draining">
       <LineId Id="10" Count="1" />
       <LineId Id="179" Count="0" />
-      <LineId Id="197" Count="1" />
-      <LineId Id="194" Count="1" />
       <LineId Id="193" Count="0" />
       <LineId Id="180" Count="1" />
+      <LineId Id="293" Count="0" />
       <LineId Id="183" Count="4" />
+      <LineId Id="294" Count="0" />
       <LineId Id="189" Count="0" />
+      <LineId Id="295" Count="0" />
+      <LineId Id="297" Count="1" />
+      <LineId Id="296" Count="0" />
       <LineId Id="24" Count="10" />
       <LineId Id="199" Count="0" />
       <LineId Id="201" Count="2" />
       <LineId Id="229" Count="0" />
       <LineId Id="204" Count="4" />
-      <LineId Id="230" Count="2" />
+      <LineId Id="300" Count="0" />
+      <LineId Id="230" Count="1" />
       <LineId Id="209" Count="0" />
       <LineId Id="211" Count="2" />
       <LineId Id="233" Count="2" />

@@ -61,6 +61,11 @@
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
+              <v n="TextID">"984"</v>
+              <v n="TextDefault">"Draining Phase Control"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
               <v n="TextID">"73"</v>
               <v n="TextDefault">"Filling Phase Control"</v>
               <l n="LanguageTexts" t="ArrayList" />
@@ -123,6 +128,11 @@
             <o>
               <v n="TextID">"98"</v>
               <v n="TextDefault">"Res. SUF"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
+              <v n="TextID">"797"</v>
+              <v n="TextDefault">"Res.Done"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>

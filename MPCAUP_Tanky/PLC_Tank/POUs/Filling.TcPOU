@@ -48,12 +48,14 @@ END_VAR]]></Declaration>
 	IF FillingPhase.State.ManCtrl THEN
          IF FillingPhase.Cmd.StartMan AND FillingPhase.State.Idle THEN
              	FillingPhase.State.Running := TRUE;
+				FillingPhase.State.Paused := FALSE;
              	FillingPhase.State.Idle := FALSE;
             	FillingPhase.State.Done := FALSE;
         	 END_IF;
          IF FillingPhase.Cmd.PauseMan AND FillingPhase.State.Running THEN
             	 FillingPhase.State.Paused := TRUE;
             	 FillingPhase.State.Running := FALSE;
+				 FillingPhase.State.Idle := FALSE;
             	 FillingPhase.State.Done := FALSE;
          END_IF;
          IF FillingPhase.Cmd.ResumeMan AND FillingPhase.State.Paused THEN
@@ -151,7 +153,11 @@ doEnabled := diEnabled;]]></ST>
       <LineId Id="853" Count="0" />
       <LineId Id="855" Count="3" />
       <LineId Id="791" Count="11" />
-      <LineId Id="929" Count="25" />
+      <LineId Id="929" Count="2" />
+      <LineId Id="1036" Count="0" />
+      <LineId Id="932" Count="5" />
+      <LineId Id="1037" Count="0" />
+      <LineId Id="938" Count="16" />
       <LineId Id="803" Count="0" />
       <LineId Id="809" Count="5" />
       <LineId Id="955" Count="10" />

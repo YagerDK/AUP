@@ -9,7 +9,8 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     oEnabled : BOOL;                  // Stav funkčního bloku
-    fScaledValue : REAL;              // Výstupní škálovaná hodnota
+    fScaledValue : REAL;
+	fScaledValue1 : REAL;                 // Výstupní škálovaná hodnota
 END_VAR
 VAR
     maxRawValue : WORD := 0;          // Maximální hodnota během intervalu
@@ -43,6 +44,11 @@ IF intervalCounter >= intervalLimit THEN
                     (maxRawValue - AnalogConversion.TransducerLoLevel) /
                     (AnalogConversion.TransducerHiLevel - AnalogConversion.TransducerLoLevel) +
                     AnalogConversion.ScaledValLoLevel;
+		
+	 fScaledValue1 := (AnalogConversion.ScaledValHiLevel - AnalogConversion.ScaledValLoLevel) *
+                    (maxRawValue - AnalogConversion.TransducerLoLevel) /
+                    (AnalogConversion.TransducerHiLevel - AnalogConversion.TransducerLoLevel) +
+                    AnalogConversion.ScaledValLoLevel;
 
     // Reset intervalu
     maxRawValue := 0;      // Reset maximální hodnoty
@@ -54,7 +60,11 @@ oEnabled := iEnabled;
 ]]></ST>
     </Implementation>
     <LineIds Name="RawToEng">
-      <LineId Id="684" Count="32" />
+      <LineId Id="684" Count="24" />
+      <LineId Id="733" Count="0" />
+      <LineId Id="735" Count="2" />
+      <LineId Id="734" Count="0" />
+      <LineId Id="709" Count="7" />
       <LineId Id="16" Count="0" />
     </LineIds>
   </POU>
