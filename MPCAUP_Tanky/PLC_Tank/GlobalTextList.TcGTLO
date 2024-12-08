@@ -101,6 +101,11 @@
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
+              <v n="TextID">"139"</v>
+              <v n="TextDefault">"Mixing Phase Control"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
               <v n="TextID">"604"</v>
               <v n="TextDefault">"Open"</v>
               <l n="LanguageTexts" t="ArrayList" />

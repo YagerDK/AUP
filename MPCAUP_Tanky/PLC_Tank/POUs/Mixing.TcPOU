@@ -20,136 +20,120 @@ END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[{region "Aut/Man"}
-	IF MixingPhase.Cmd.AutCtrl THEN
-		MixingPhase.State.AutCtrl := TRUE;
-		MixingPhase.State.ManCtrl := FALSE;	 
-	END_IF
-		 
-	IF MixingPhase.Cmd.ManCtrl THEN
-		MixingPhase.State.AutCtrl := FALSE;
-		MixingPhase.State.ManCtrl := TRUE;
-	END_IF;
-		 
-	IF NOT MixingPhase.State.AutCtrl AND NOT MixingPhase.State.ManCtrl THEN
-		MixingPhase.State.ManCtrl := TRUE;
-		MixingPhase.State.AutCtrl := FALSE;
-	END_IF;
- 
+// Přepínání mezi automatickým a manuálním režimem
+IF MixingPhase.Cmd.AutCtrl THEN
+    MixingPhase.State.AutCtrl := TRUE;
+    MixingPhase.State.ManCtrl := FALSE;
+    MixerEng.Cmd.AutCtrl := TRUE;
+END_IF;
+
+IF MixingPhase.Cmd.ManCtrl THEN
+    MixingPhase.State.ManCtrl := TRUE;
+    MixingPhase.State.AutCtrl := FALSE;
+    MixerEng.Cmd.ManCtrl := TRUE;
+END_IF;
+
+IF NOT MixingPhase.State.AutCtrl AND NOT MixingPhase.State.ManCtrl THEN
+    MixingPhase.State.ManCtrl := TRUE;
+END_IF;
 {endregion}
 
 {region "ManCtrl"}
-    // processing manual actions - if command is processed, it is sets to FALSE even if can't be processed
-    // Phase commands are start, stop, pause and resume 
-    // Start - start mixing  
-    // Stop - stop mixing
-    // Pause - stop mixing 
-    // Resume - start mixing
-    // real states of phase are writed into states in phase structure
-		 
-	IF MixingPhase.State.ManCtrl THEN
-		IF MixingPhase.Cmd.StartMan AND MixingPhase.State.Idle THEN
-			MixingPhase.State.Running := TRUE;
-			MixingPhase.State.Idle := FALSE;
-			MixingPhase.State.Paused := FALSE;
-			MixingPhase.State.Done := FALSE;	 
-		END_IF
-			 
-		IF MixingPhase.Cmd.PauseMan AND MixingPhase.State.Running THEN
-			MixingPhase.State.Running := FALSE;
-			MixingPhase.State.Idle := FALSE;
-			MixingPhase.State.Paused := TRUE;
-			MixingPhase.State.Done := FALSE;	 
-		END_IF
-			 
-				  
-		IF MixingPhase.Cmd.ResumeMan AND MixingPhase.State.Paused THEN
-			MixingPhase.State.Running := TRUE;
-			MixingPhase.State.Idle := FALSE;
-			MixingPhase.State.Paused := FALSE;
-			MixingPhase.State.Done := FALSE;	 
-		END_IF
-			 
-		IF MixingPhase.Cmd.StopMan AND (MixingPhase.State.Running OR MixingPhase.State.Paused) THEN
-			MixingPhase.State.Running := FALSE;
-			MixingPhase.State.Idle := TRUE;
-			MixingPhase.State.Paused := FALSE;
-			MixingPhase.State.Done := FALSE;	 
-		END_IF
-			 
-		MixingPhase.State.Running := FALSE;
-		MixingPhase.State.Idle := FALSE;
-		MixingPhase.State.Paused := FALSE;
-		MixingPhase.State.Done := FALSE;		 		  
-	END_IF
-   
+// Zpracování manuálních akcí
+IF MixingPhase.State.ManCtrl THEN
+    IF MixingPhase.Cmd.StartMan AND MixingPhase.State.Idle THEN
+        MixingPhase.State.Running := TRUE;
+        MixingPhase.State.Idle := FALSE;
+        MixingPhase.State.Paused := FALSE;
+        MixingPhase.State.Done := FALSE;
+		MixerEng.Cmd.TurnOnMan := TRUE;
+    END_IF;
+
+    IF MixingPhase.Cmd.PauseMan AND MixingPhase.State.Running THEN
+        MixingPhase.State.Paused := TRUE;
+        MixingPhase.State.Running := FALSE;
+        MixingPhase.State.Idle := FALSE;
+        MixingPhase.State.Done := FALSE;
+		
+    END_IF;
+
+    IF MixingPhase.Cmd.ResumeMan AND MixingPhase.State.Paused THEN
+        MixingPhase.State.Running := TRUE;
+        MixingPhase.State.Paused := FALSE;
+        MixingPhase.State.Done := FALSE;
+    END_IF;
+
+    IF MixingPhase.Cmd.StopMan AND (MixingPhase.State.Paused OR MixingPhase.State.Running) THEN
+        MixingPhase.State.Idle := TRUE;
+        MixingPhase.State.Paused := FALSE;
+        MixingPhase.State.Running := FALSE;
+        MixingPhase.State.Done := FALSE;
+    END_IF;
+
+    MixingPhase.Cmd.StartMan := FALSE;
+    MixingPhase.Cmd.PauseMan := FALSE;
+    MixingPhase.Cmd.ResumeMan := FALSE;
+    MixingPhase.Cmd.StopMan := FALSE;
+END_IF;
 {endregion}
 
 {region "AutCtrl"}
-    // if request to run in automatic mode -> set auto request to mixing to 1, if not request to mixing is 0
-  
-	IF MixingPhase.State.AutCtrl THEN
-		IF MixingPhase.Cmd.StartAut AND MixingPhase.State.Idle THEN
-			MixingPhase.State.Running := TRUE;
-			MixingPhase.State.Idle := FALSE;	
-		END_IF
-		IF MixingPhase.Cmd.StopAut AND MixingPhase.State.Running THEN
-			MixingPhase.State.Idle := TRUE;
-			MixingPhase.State.Running := FALSE;
-		END_IF
-		MixingPhase.Cmd.StartAut := FALSE;
-		MixingPhase.Cmd.StopAut := FALSE;
-	END_IF
- 
- 	
+// Automatický režim
+IF MixingPhase.State.AutCtrl THEN
+    IF MixingPhase.Cmd.StartAut AND MixingPhase.State.Idle THEN
+        MixingPhase.State.Running := TRUE;
+        MixingPhase.State.Idle := FALSE;
+    END_IF;
+
+    IF MixingPhase.Cmd.StopAut AND MixingPhase.State.Running THEN
+        MixingPhase.State.Idle := TRUE;
+        MixingPhase.State.Running := FALSE;
+    END_IF;
+
+    MixingPhase.Cmd.StartAut := FALSE;
+    MixingPhase.Cmd.StopAut := FALSE;
+END_IF;
 {endregion}
 
 {region "Done"}
-    // every phase should have finish condition - mixing phase - if time of runnig is bigger or same as requested
-    // after that done state should be setted to 1
- 	
+// Podmínka dokončení fáze
+iR_TRIG(CLK := iSecImp);
 
-iR_TRIG(CLK := Global.secImp);
-
-// Počítání uběhlého času
 IF iR_TRIG.Q THEN
     IF MixingPhase.State.Idle THEN
-        ElapsedTime := 0; 
+        ElapsedTime := 0;
     ELSIF MixingPhase.State.Running THEN
-        ElapsedTime := ElapsedTime + 1; 
+        ElapsedTime := ElapsedTime + 1;
     END_IF;
 END_IF;
 
-// Kontrola dokončení fáze
 IF ElapsedTime >= MixingPhase.ParamTimeSec THEN
     MixingPhase.State.Done := TRUE;
 END_IF;
 
-// Resetování stavu Done
 IF MixingPhase.Cmd.ResetDone THEN
     MixingPhase.State.Done := FALSE;
     MixingPhase.Cmd.ResetDone := FALSE;
 END_IF;
-
 {endregion}
 
 {region "States"}
-    //Command mixer in cases of states
-	IF MixingPhase.State.Running THEN
-		MixerEng.Cmd.Req2RunAutCtrl := TRUE;
-	END_IF;
-	IF MixingPhase.State.Idle OR MixingPhase.State.Paused THEN
-		MixerEng.Cmd.Req2RunAutCtrl := FALSE;
-	END_IF;
-{endregion}
-
-
-// delault state of phase - if not any state sets state to idle
-IF NOT MixingPhase.State.Idle AND NOT MixingPhase.State.Done AND NOT MixingPhase.State.Paused AND NOT MixingPhase.State.Running THEN
-    MixingPhase.State.Idle := 1;
+// Příkazy motoru pro jednotlivé stavy
+IF MixingPhase.State.Running THEN
+    MixerEng.Cmd.Req2RunAutCtrl := TRUE;
 END_IF;
 
+IF MixingPhase.State.Idle OR MixingPhase.State.Paused THEN
+    MixerEng.Cmd.Req2RunAutCtrl := FALSE;
+END_IF;
+{endregion}
 
-// delault state of phase - if not any state sets state to idle
+// Výchozí stav fáze - Idle
+IF NOT MixingPhase.State.Idle AND NOT MixingPhase.State.Paused AND NOT MixingPhase.State.Running THEN
+    MixingPhase.State.Idle := TRUE;
+END_IF;
+
+// Vizualizace stavu fáze
 IF MixingPhase.State.Idle THEN
     MixingPhase.State.StateInt := Global.PhIdle;
 ELSIF MixingPhase.State.Running THEN
@@ -162,52 +146,11 @@ doEnabled := diEnabled;
 ]]></ST>
     </Implementation>
     <LineIds Name="Mixing">
-      <LineId Id="10" Count="0" />
-      <LineId Id="187" Count="0" />
-      <LineId Id="258" Count="0" />
-      <LineId Id="260" Count="0" />
-      <LineId Id="259" Count="0" />
-      <LineId Id="261" Count="0" />
-      <LineId Id="264" Count="2" />
-      <LineId Id="268" Count="0" />
-      <LineId Id="273" Count="0" />
-      <LineId Id="269" Count="3" />
-      <LineId Id="262" Count="0" />
-      <LineId Id="25" Count="9" />
-      <LineId Id="274" Count="1" />
-      <LineId Id="283" Count="4" />
-      <LineId Id="282" Count="0" />
-      <LineId Id="288" Count="0" />
-      <LineId Id="290" Count="4" />
-      <LineId Id="289" Count="0" />
-      <LineId Id="295" Count="1" />
-      <LineId Id="303" Count="4" />
-      <LineId Id="297" Count="0" />
-      <LineId Id="308" Count="0" />
-      <LineId Id="310" Count="4" />
-      <LineId Id="309" Count="0" />
-      <LineId Id="320" Count="0" />
-      <LineId Id="317" Count="2" />
-      <LineId Id="315" Count="0" />
-      <LineId Id="277" Count="0" />
-      <LineId Id="78" Count="4" />
-      <LineId Id="191" Count="0" />
-      <LineId Id="321" Count="1" />
-      <LineId Id="325" Count="2" />
-      <LineId Id="330" Count="5" />
-      <LineId Id="329" Count="0" />
-      <LineId Id="328" Count="0" />
-      <LineId Id="323" Count="0" />
-      <LineId Id="100" Count="0" />
-      <LineId Id="103" Count="3" />
-      <LineId Id="123" Count="0" />
-      <LineId Id="350" Count="13" />
-      <LineId Id="366" Count="7" />
-      <LineId Id="341" Count="0" />
-      <LineId Id="124" Count="3" />
-      <LineId Id="336" Count="4" />
-      <LineId Id="132" Count="18" />
-      <LineId Id="9" Count="0" />
+      <LineId Id="407" Count="26" />
+      <LineId Id="529" Count="0" />
+      <LineId Id="434" Count="6" />
+      <LineId Id="530" Count="0" />
+      <LineId Id="441" Count="87" />
       <LineId Id="166" Count="0" />
     </LineIds>
   </POU>
