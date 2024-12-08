@@ -4,14 +4,64 @@
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
 
+current_state : INT;
+next_state : INT;
+start_process : BOOL;
+
+
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[
-]]></ST>
+CASE Current_state OF
+	0: // Init
+		IF start_process THEN
+			Global.Tank1.Filling.ParamFillLevel := 1;
+			Global.Tank1.Draining.ParamDrainLevel := 0;
+			Global.Tank1.Filling.Cmd.ResetDone := TRUE;
+			//Global.Tank1.Draining.Cmd.ResetDone := TRUE;
+			//start_process := FALSE;
+			next_state := 1;
+		ELSE
+			next_state := 0;
+		END_IF;
+		
+		
+	1: // Filling
+		Global.Tank1.Filling.Cmd.StartAut := TRUE;
+		IF Global.Tank1.Filling.State.Done THEN
+			next_state := 2;
+		END_IF;
+		
+	2: //Draining
+		Global.Tank1.Draining.Cmd.StartAut := TRUE;
+		IF Global.Tank1.Draining.State.Done THEN
+			next_state := 3;
+		END_IF;
+		
+		
+	
+END_CASE;
+current_state := next_state;]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
-      <LineId Id="994" Count="0" />
+      <LineId Id="1016" Count="0" />
       <LineId Id="368" Count="0" />
+      <LineId Id="1020" Count="0" />
+      <LineId Id="1022" Count="1" />
+      <LineId Id="1025" Count="0" />
+      <LineId Id="1034" Count="1" />
+      <LineId Id="1045" Count="0" />
+      <LineId Id="1026" Count="2" />
+      <LineId Id="1024" Count="0" />
+      <LineId Id="1029" Count="3" />
+      <LineId Id="1047" Count="0" />
+      <LineId Id="1036" Count="4" />
+      <LineId Id="1043" Count="1" />
+      <LineId Id="1042" Count="0" />
+      <LineId Id="1041" Count="0" />
+      <LineId Id="1021" Count="0" />
+      <LineId Id="1017" Count="1" />
+      <LineId Id="1048" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
