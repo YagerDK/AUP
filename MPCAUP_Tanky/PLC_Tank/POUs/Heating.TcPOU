@@ -20,7 +20,7 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
+      <ST><![CDATA[iSecImp := Global.secImp; 
 
 {region "Aut/Man"}
 // Přepínání mezi automatickým a manuálním režimem
@@ -105,7 +105,7 @@ END_IF;
 
 {region "Done"}
 // Podmínka dokončení fáze
-iR_TRIG(CLK := iSecImp);
+iR_TRIG(CLK := Global.secImp);
 
 IF iR_TRIG.Q THEN
     IF HeatingPhase.State.Idle THEN

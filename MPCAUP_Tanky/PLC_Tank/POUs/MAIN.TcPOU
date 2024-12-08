@@ -7,32 +7,49 @@ VAR
 current_state : INT;
 next_state : INT;
 start_process : BOOL;
-
+initialized : BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[CASE Current_state OF
     0: // Init
         IF start_process THEN
-
-            Global.Tank1.Filling.Cmd.ResetDone := TRUE; // Reset fáze Filling
-            Global.Tank1.Heating.Cmd.ResetDone := TRUE; // Reset fáze Heating
-            Global.Tank1.Mixing.Cmd.ResetDone := TRUE; // Reset fáze Mixing
-            Global.Tank1.Draining.Cmd.ResetDone := TRUE; // Reset fáze Draining
-            next_state := 1; // Přechod na Filling
+            next_state := 1; // Přechod na inicializaci hodnot
         ELSE
-            next_state := 0; // Zůstáváme v Init
+            next_state := 0; // Zůstáváme v Inith
         END_IF;
 
-    1: // Filling
+    1: // InitValues
+        // Nastavení výchozích hodnot pro všechny fáze (jen jednou)
+        IF NOT initialized THEN
+            Global.Tank1.Filling.ParamFillLevel := 1.0;
+            Global.Tank1.Heating.ParamReqTemp := 60.0;
+            Global.Tank1.Mixing.ParamTimeSec := 10;
+            Global.Tank1.Draining.ParamDrainLevel := 0.0;
+            
+            Global.maxWaterTemp := 95;
+            Global.timeReqOnTemp := 10;
+
+            initialized := TRUE; // Označení, že inicializace proběhla
+        END_IF;
+
+        // Resetování stavů Done
+        Global.Tank1.Filling.Cmd.ResetDone := TRUE;
+        Global.Tank1.Heating.Cmd.ResetDone := TRUE;
+        Global.Tank1.Mixing.Cmd.ResetDone := TRUE;
+        Global.Tank1.Draining.Cmd.ResetDone := TRUE;
+
+        start_process := FALSE;
+        next_state := 2; // Přechod na Filling
+
+    2: // Filling
         Global.Tank1.Filling.Cmd.StartAut := TRUE; // Spuštění Filling fáze
         IF Global.Tank1.Filling.State.Done THEN
             Global.Tank1.Filling.Cmd.StartAut := FALSE; // Zastavení Filling
-            next_state := 2; // Přechod na Heating
+            next_state := 3; // Přechod na Heating
         END_IF;
 
-    2: // Heating
-     
+    3: // Heating
         Global.Tank1.Heating.Cmd.StartAut := TRUE; // Spuštění Heating fáze
         IF Global.Tank1.Heating.State.Running AND Global.Tank1.Heating.WaterTemp > 40 THEN
             Global.Tank1.Mixing.Cmd.StartAut := TRUE; // Zahájit Mixing při dosažení 40 °C
@@ -40,33 +57,37 @@ END_VAR
 
         IF Global.Tank1.Heating.State.Done THEN
             Global.Tank1.Heating.Cmd.StartAut := FALSE; // Zastavení Heating
-            Global.Tank1.Mixing.Cmd.StartAut := FALSE; // Zastavení Mixing
-            next_state := 3; // Přechod na Draining
-        END_IF;
-
-    3: // Mixing
-
-        Global.Tank1.Mixing.Cmd.StartAut := TRUE; // Spuštění Mixing fáze
-        IF Global.Tank1.Mixing.State.Done THEN
-            Global.Tank1.Mixing.Cmd.StartAut := FALSE; // Zastavení Mixing
-            next_state := 4; // Přechod na Draining
+            next_state := 4; // Přechod na Mixing
         END_IF;
 
     4: // Draining
         Global.Tank1.Draining.Cmd.StartAut := TRUE; // Spuštění Draining fáze
+        Global.Tank1.Mixing.Cmd.StartAut := TRUE; // Mixér pokračuje během vypouštění
         IF Global.Tank1.Draining.State.Done THEN
             Global.Tank1.Draining.Cmd.StartAut := FALSE; // Zastavení Draining
-            next_state := 0; // Návrat do Init
+            Global.Tank1.Mixing.Cmd.StartAut := FALSE; // Zastavení Mixing po vypuštění
+			 Global.Tank1.Mixing.Cmd.StopAut := TRUE;
+            next_state := 5; // Přechod na Reset
         END_IF;
 
+    5: // Reset
+        // Resetování stavů Done a příprava na další cyklus
+        Global.Tank1.Filling.Cmd.ResetDone := TRUE;
+        Global.Tank1.Heating.Cmd.ResetDone := TRUE;
+        Global.Tank1.Mixing.Cmd.ResetDone := TRUE;
+        Global.Tank1.Draining.Cmd.ResetDone := TRUE;
+
+        next_state := 2; // Návrat na Filling
 END_CASE;
 
 current_state := next_state;
 ]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
-      <LineId Id="1042" Count="2" />
-      <LineId Id="1046" Count="47" />
+      <LineId Id="1269" Count="47" />
+      <LineId Id="1323" Count="6" />
+      <LineId Id="1344" Count="0" />
+      <LineId Id="1330" Count="13" />
       <LineId Id="368" Count="0" />
     </LineIds>
   </POU>

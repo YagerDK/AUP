@@ -100,24 +100,26 @@ END_IF;
 
 {region "Done"}
 // Podmínka dokončení fáze
-iR_TRIG(CLK := iSecImp);
+//iR_TRIG(CLK := iSecImp);
 
-IF iR_TRIG.Q THEN
-    IF MixingPhase.State.Idle THEN
-        ElapsedTime := 0;
-    ELSIF MixingPhase.State.Running THEN
-        ElapsedTime := ElapsedTime + 1;
-    END_IF;
-END_IF;
+//IF iR_TRIG.Q THEN
+//    IF MixingPhase.State.Idle THEN
+//        ElapsedTime := 0;
+//    ELSIF MixingPhase.State.Running THEN
+//        ElapsedTime := ElapsedTime + 1;
+//    END_IF;
+//END_IF;
 
-IF ElapsedTime >= MixingPhase.ParamTimeSec THEN
-    MixingPhase.State.Done := TRUE;
-END_IF;
+//IF ElapsedTime >= MixingPhase.ParamTimeSec THEN
+//    MixingPhase.State.Done := TRUE;
+//END_IF;
 
-IF MixingPhase.Cmd.ResetDone THEN
-    MixingPhase.State.Done := FALSE;
-    MixingPhase.Cmd.ResetDone := FALSE;
-END_IF;
+//IF MixingPhase.Cmd.ResetDone THEN
+//    MixingPhase.State.Done := FALSE;
+//    MixingPhase.Cmd.ResetDone := FALSE;
+//END_IF;
+	 
+		  
 {endregion}
 
 {region "States"}
@@ -149,7 +151,9 @@ doEnabled := diEnabled;
 ]]></ST>
     </Implementation>
     <LineIds Name="Mixing">
-      <LineId Id="566" Count="126" />
+      <LineId Id="566" Count="98" />
+      <LineId Id="709" Count="1" />
+      <LineId Id="665" Count="27" />
       <LineId Id="166" Count="0" />
     </LineIds>
   </POU>
