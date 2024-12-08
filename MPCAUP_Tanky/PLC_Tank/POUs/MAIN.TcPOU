@@ -11,44 +11,62 @@ start_process : BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
-CASE Current_state OF
-	0: // Init
-		IF start_process THEN
-			Global.Tank1.Filling.ParamFillLevel := 1;
-			Global.Tank1.Draining.ParamDrainLevel := 0;
-			Global.Tank1.Filling.Cmd.ResetDone := TRUE;
-			//start_process := FALSE;
-			next_state := 1;
-		ELSE
-			next_state := 0;
-		END_IF;
-		
-		
-	1: // Filling
-		Global.Tank1.Filling.Cmd.StartAut := TRUE;
-		IF Global.Tank1.Filling.State.Done THEN
-			next_state := 2;
-		END_IF;
-		
-	2: //Draining
-		Global.Tank1.Draining.Cmd.ResetDone := TRUE;
-		Global.Tank1.Draining.Cmd.StartAut := TRUE;
-		IF Global.Tank1.Draining.State.Done THEN
-			next_state := 3;
-		END_IF;
-		
-		
-	
+      <ST><![CDATA[CASE Current_state OF
+    0: // Init
+        IF start_process THEN
+
+            Global.Tank1.Filling.Cmd.ResetDone := TRUE; // Reset fáze Filling
+            Global.Tank1.Heating.Cmd.ResetDone := TRUE; // Reset fáze Heating
+            Global.Tank1.Mixing.Cmd.ResetDone := TRUE; // Reset fáze Mixing
+            Global.Tank1.Draining.Cmd.ResetDone := TRUE; // Reset fáze Draining
+            next_state := 1; // Přechod na Filling
+        ELSE
+            next_state := 0; // Zůstáváme v Init
+        END_IF;
+
+    1: // Filling
+        Global.Tank1.Filling.Cmd.StartAut := TRUE; // Spuštění Filling fáze
+        IF Global.Tank1.Filling.State.Done THEN
+            Global.Tank1.Filling.Cmd.StartAut := FALSE; // Zastavení Filling
+            next_state := 2; // Přechod na Heating
+        END_IF;
+
+    2: // Heating
+     
+        Global.Tank1.Heating.Cmd.StartAut := TRUE; // Spuštění Heating fáze
+        IF Global.Tank1.Heating.State.Running AND Global.Tank1.Heating.WaterTemp > 40 THEN
+            Global.Tank1.Mixing.Cmd.StartAut := TRUE; // Zahájit Mixing při dosažení 40 °C
+        END_IF;
+
+        IF Global.Tank1.Heating.State.Done THEN
+            Global.Tank1.Heating.Cmd.StartAut := FALSE; // Zastavení Heating
+            Global.Tank1.Mixing.Cmd.StartAut := FALSE; // Zastavení Mixing
+            next_state := 3; // Přechod na Draining
+        END_IF;
+
+    3: // Mixing
+
+        Global.Tank1.Mixing.Cmd.StartAut := TRUE; // Spuštění Mixing fáze
+        IF Global.Tank1.Mixing.State.Done THEN
+            Global.Tank1.Mixing.Cmd.StartAut := FALSE; // Zastavení Mixing
+            next_state := 4; // Přechod na Draining
+        END_IF;
+
+    4: // Draining
+        Global.Tank1.Draining.Cmd.StartAut := TRUE; // Spuštění Draining fáze
+        IF Global.Tank1.Draining.State.Done THEN
+            Global.Tank1.Draining.Cmd.StartAut := FALSE; // Zastavení Draining
+            next_state := 0; // Návrat do Init
+        END_IF;
+
 END_CASE;
-current_state := next_state;]]></ST>
+
+current_state := next_state;
+]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
-      <LineId Id="994" Count="0" />
-      <LineId Id="1004" Count="5" />
-      <LineId Id="1011" Count="13" />
-      <LineId Id="1033" Count="0" />
-      <LineId Id="1025" Count="7" />
+      <LineId Id="1042" Count="2" />
+      <LineId Id="1046" Count="47" />
       <LineId Id="368" Count="0" />
     </LineIds>
   </POU>
