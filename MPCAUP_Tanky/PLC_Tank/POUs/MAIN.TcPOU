@@ -11,7 +11,10 @@ initialized : BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[CASE Current_state OF
+      <ST><![CDATA[// Generování časového impulsu
+Global.secImp := NOT(Global.secImp);
+
+CASE Current_state OF
     0: // Init
         IF start_process THEN
             next_state := 1; // Přechod na inicializaci hodnot
@@ -84,6 +87,8 @@ current_state := next_state;
 ]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
+      <LineId Id="1347" Count="0" />
+      <LineId Id="1345" Count="1" />
       <LineId Id="1269" Count="47" />
       <LineId Id="1323" Count="6" />
       <LineId Id="1344" Count="0" />
