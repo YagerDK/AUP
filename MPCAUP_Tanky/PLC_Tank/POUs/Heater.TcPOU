@@ -20,9 +20,9 @@ END_VAR
     <Implementation>
       <ST><![CDATA[
 // Nastavení PID parametrů
-pidParameters.fKp := 10.0;
-pidParameters.tTn := T#2S;
-pidParameters.tTv := T#0.5S;
+pidParameters.fKp := 2.422; //10.0;
+pidParameters.tTn := T#231.6S; //T#2S;
+pidParameters.tTv := T#0MS;//T#0.5S;
 pidParameters.tCtrlCycleTime := T#200MS;
 pidParameters.tTaskCycleTime := T#100MS;
 pidParameters.fOutMaxLimit := 100.0;
