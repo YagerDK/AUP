@@ -111,7 +111,7 @@ IF iR_TRIG.Q THEN
     IF HeatingPhase.State.Idle THEN
         ElapsedTime := 0;
     ELSIF HeatingPhase.State.Running THEN
-        IF ABS(HeatingPhase.WaterTemp - HeatingPhase.ParamReqTemp) <= 1.0 THEN
+        IF ((HeatingPhase.WaterTemp - HeatingPhase.ParamReqTemp)) >= -5 AND ((HeatingPhase.WaterTemp - HeatingPhase.ParamReqTemp) <= 5) THEN
             ElapsedTime := ElapsedTime + 1;
         ELSE
             ElapsedTime := 0;

@@ -8,10 +8,15 @@ current_state : INT;
 next_state : INT;
 start_process : BOOL;
 initialized : BOOL;
+
+hasCycled : BOOL := FALSE;
+waitTimer : TON; 
+	
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[// Generování časového impulsu
+      <ST><![CDATA[
+// Generování časového impulsu
 Global.secImp := NOT(Global.secImp);
 
 CASE Current_state OF
@@ -19,15 +24,15 @@ CASE Current_state OF
         IF start_process THEN
             next_state := 1; // Přechod na inicializaci hodnot
         ELSE
-            next_state := 0; // Zůstáváme v Inith
+            next_state := 0; // Zůstáváme v Init
         END_IF;
 
     1: // InitValues
         // Nastavení výchozích hodnot pro všechny fáze (jen jednou)
         IF NOT initialized THEN
-            Global.Tank1.Filling.ParamFillLevel := 1.0;
-            Global.Tank1.Heating.ParamReqTemp := 60.0;
-            Global.Tank1.Mixing.ParamTimeSec := 10;
+            Global.Tank1.Filling.ParamFillLevel := 0.4;
+            Global.Tank1.Heating.ParamReqTemp := 50.0;
+            Global.timeReqOnTemp := 5;
             Global.Tank1.Draining.ParamDrainLevel := 0.0;
             
             Global.maxWaterTemp := 95;
@@ -46,7 +51,18 @@ CASE Current_state OF
         next_state := 2; // Přechod na Filling
 
     2: // Filling
-        Global.Tank1.Filling.Cmd.StartAut := TRUE; // Spuštění Filling fáze
+        // Přidání čekání, pokud cyklus již proběhl
+        IF hasCycled THEN
+            waitTimer(IN := TRUE, PT := Global.Tank1.ValveDraining.Time2Open); // Časovač čekání 5 sekund
+            IF waitTimer.Q THEN
+                waitTimer(IN := FALSE); // Reset časovače
+                hasCycled := FALSE; // Reset indikace cyklu
+                Global.Tank1.Filling.Cmd.StartAut := TRUE; // Spuštění Filling fáze
+            END_IF;
+        ELSE
+            Global.Tank1.Filling.Cmd.StartAut := TRUE; // Spuštění Filling fáze
+        END_IF;
+
         IF Global.Tank1.Filling.State.Done THEN
             Global.Tank1.Filling.Cmd.StartAut := FALSE; // Zastavení Filling
             next_state := 3; // Přechod na Heating
@@ -54,13 +70,13 @@ CASE Current_state OF
 
     3: // Heating
         Global.Tank1.Heating.Cmd.StartAut := TRUE; // Spuštění Heating fáze
-        IF Global.Tank1.Heating.State.Running AND Global.Tank1.Heating.WaterTemp > 40 THEN
+        IF Global.Tank1.Heating.State.Running AND Global.Tank1.Heating.WaterTemp > 35 THEN
             Global.Tank1.Mixing.Cmd.StartAut := TRUE; // Zahájit Mixing při dosažení 40 °C
         END_IF;
 
         IF Global.Tank1.Heating.State.Done THEN
             Global.Tank1.Heating.Cmd.StartAut := FALSE; // Zastavení Heating
-            next_state := 4; // Přechod na Mixing
+            next_state := 4; // Přechod na Draining
         END_IF;
 
     4: // Draining
@@ -69,7 +85,7 @@ CASE Current_state OF
         IF Global.Tank1.Draining.State.Done THEN
             Global.Tank1.Draining.Cmd.StartAut := FALSE; // Zastavení Draining
             Global.Tank1.Mixing.Cmd.StartAut := FALSE; // Zastavení Mixing po vypuštění
-			 Global.Tank1.Mixing.Cmd.StopAut := TRUE;
+            Global.Tank1.Mixing.Cmd.StopAut := TRUE;
             next_state := 5; // Přechod na Reset
         END_IF;
 
@@ -80,6 +96,7 @@ CASE Current_state OF
         Global.Tank1.Mixing.Cmd.ResetDone := TRUE;
         Global.Tank1.Draining.Cmd.ResetDone := TRUE;
 
+        hasCycled := TRUE; // Označení, že cyklus proběhl
         next_state := 2; // Návrat na Filling
 END_CASE;
 
@@ -87,12 +104,7 @@ current_state := next_state;
 ]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
-      <LineId Id="1347" Count="0" />
-      <LineId Id="1345" Count="1" />
-      <LineId Id="1269" Count="47" />
-      <LineId Id="1323" Count="6" />
-      <LineId Id="1344" Count="0" />
-      <LineId Id="1330" Count="13" />
+      <LineId Id="1356" Count="85" />
       <LineId Id="368" Count="0" />
     </LineIds>
   </POU>
