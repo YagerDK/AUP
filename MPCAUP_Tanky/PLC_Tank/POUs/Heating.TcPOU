@@ -23,7 +23,7 @@ END_VAR
       <ST><![CDATA[iSecImp := Global.secImp; 
 
 {region "Aut/Man"}
-// Přepínání mezi automatickým a manuálním režimem
+    // switching state of engine - automatic or manual control (default state is manual)
 IF HeatingPhase.Cmd.AutCtrl THEN
     HeatingPhase.State.AutCtrl := TRUE;
     HeatingPhase.State.ManCtrl := FALSE;
@@ -46,7 +46,8 @@ HeatingPhase.Cmd.ManCtrl := FALSE;
 {endregion}
 
 {region "ManCtrl"}
-// Zpracování manuálních akcí
+    // processing manual actions - if command is processed, it is sets to FALSE even if can't be processed
+        // real states of phase are writed into states in phase structure
 IF HeatingPhase.State.ManCtrl THEN
     IF HeatingPhase.Cmd.StartMan AND HeatingPhase.State.Idle THEN
         HeatingPhase.State.Running := TRUE;
@@ -84,7 +85,9 @@ END_IF;
 {endregion}
 
 {region "AutCtrl"}
-// Automatický režim
+    // if request to run in automatic mode -> set auto request to heat to 1, if not request to heat 0
+    // commands should be sets to false after their processing
+  
 IF HeatingPhase.State.AutCtrl THEN
     IF HeatingPhase.Cmd.StartAut AND HeatingPhase.State.Idle THEN
         HeatingPhase.State.Running := TRUE;
@@ -104,7 +107,9 @@ END_IF;
 {endregion}
 
 {region "Done"}
-// Podmínka dokončení fáze
+   //every phase should have finish condition - heating phase - if water temp is on requested value for 15 seconds with 1°C hysteresis
+    //after that done state should be setted to 1
+    // command reset done resets done state and than resets command
 iR_TRIG(CLK := Global.secImp);
 
 IF iR_TRIG.Q THEN
@@ -133,7 +138,10 @@ END_IF;
 {endregion}
 
 {region "States"}
-// Řízení ohřívače podle stavů
+    //Command valve in cases of states
+    // Running - start heating  
+    // Idle - stop heating
+    // Pause - stop heating (alternative is hold actual temp)
 IF HeatingPhase.State.Running THEN
     Heater.Cmd.Req2RunAutCtrl := TRUE;
     Heater.ParamHeatingSetPointAutomat := HeatingPhase.ParamReqTemp;
@@ -144,7 +152,7 @@ IF HeatingPhase.State.Idle OR HeatingPhase.State.Paused THEN
 END_IF;
 {endregion}
 
-// Výchozí stav fáze - Idle
+// delault state of phase - if not any state sets state to idle
 IF NOT HeatingPhase.State.Idle AND NOT HeatingPhase.State.Paused AND NOT HeatingPhase.State.Running THEN
     HeatingPhase.State.Idle := TRUE;
 END_IF;
@@ -153,7 +161,15 @@ doEnabled := diEnabled;
 ]]></ST>
     </Implementation>
     <LineIds Name="Heating">
-      <LineId Id="826" Count="129" />
+      <LineId Id="826" Count="25" />
+      <LineId Id="973" Count="0" />
+      <LineId Id="852" Count="37" />
+      <LineId Id="974" Count="1" />
+      <LineId Id="890" Count="19" />
+      <LineId Id="980" Count="1" />
+      <LineId Id="910" Count="28" />
+      <LineId Id="985" Count="2" />
+      <LineId Id="939" Count="16" />
       <LineId Id="9" Count="0" />
     </LineIds>
   </POU>

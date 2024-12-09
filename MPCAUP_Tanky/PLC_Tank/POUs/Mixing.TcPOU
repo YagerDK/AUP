@@ -19,10 +19,8 @@ iR_TRIG : R_TRIG;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
-
-{region "Aut/Man"}
-// Přepínání mezi automatickým a manuálním režimem
+      <ST><![CDATA[{region "Aut/Man"}
+// switching state of engine - automatic or manual control (default state is manual)
 IF MixingPhase.Cmd.AutCtrl THEN
     MixingPhase.State.AutCtrl := TRUE;
     MixingPhase.State.ManCtrl := FALSE;
@@ -41,7 +39,13 @@ END_IF;
 {endregion}
 
 {region "ManCtrl"}
-// Manuální režim
+    // processing manual actions - if command is processed, it is sets to FALSE even if can't be processed
+    // Phase commands are start, stop, pause and resume 
+    // Start - start mixing  
+    // Stop - stop mixing
+    // Pause - stop mixing 
+    // Resume - start mixing
+    // real states of phase are writed into states in phase structure
 IF MixingPhase.State.ManCtrl THEN
     IF MixingPhase.Cmd.StartMan AND MixingPhase.State.Idle THEN
         MixingPhase.State.Running := TRUE;
@@ -79,7 +83,8 @@ END_IF;
 {endregion}
 
 {region "AutCtrl"}
-// Automatický režim
+    // if request to run in automatic mode -> set auto request to mixing to 1, if not request to mixing is 0
+    // commands should be sets to false after their processing
 IF MixingPhase.State.AutCtrl THEN
     IF MixingPhase.Cmd.StartAut AND MixingPhase.State.Idle THEN
         MixingPhase.State.Running := TRUE;
@@ -99,31 +104,13 @@ END_IF;
 {endregion}
 
 {region "Done"}
-// Podmínka dokončení fáze
-//iR_TRIG(CLK := iSecImp);
-
-//IF iR_TRIG.Q THEN
-//    IF MixingPhase.State.Idle THEN
-//        ElapsedTime := 0;
-//    ELSIF MixingPhase.State.Running THEN
-//        ElapsedTime := ElapsedTime + 1;
-//    END_IF;
-//END_IF;
-
-//IF ElapsedTime >= MixingPhase.ParamTimeSec THEN
-//    MixingPhase.State.Done := TRUE;
-//END_IF;
-
-//IF MixingPhase.Cmd.ResetDone THEN
-//    MixingPhase.State.Done := FALSE;
-//    MixingPhase.Cmd.ResetDone := FALSE;
-//END_IF;
-	 
+    // every phase should have finish condition - mixing phase - if time of runnig is bigger or same as requested
+    // after that done state should be setted to 1
 		  
 {endregion}
 
 {region "States"}
-// Řízení motoru podle stavů
+ //Command mixer in cases of states
 IF MixingPhase.State.Running THEN
     MixerEng.Cmd.Req2RunAutCtrl := TRUE;
 END_IF;
@@ -133,12 +120,12 @@ IF MixingPhase.State.Idle OR MixingPhase.State.Paused THEN
 END_IF;
 {endregion}
 
-// Výchozí stav fáze - Idle
+// delault state of phase - if not any state sets state to idle
 IF NOT MixingPhase.State.Idle AND NOT MixingPhase.State.Paused AND NOT MixingPhase.State.Running THEN
     MixingPhase.State.Idle := TRUE;
 END_IF;
 
-// Vizualizace stavu fáze
+// delault state of phase - if not any state sets state to idle
 IF MixingPhase.State.Idle THEN
     MixingPhase.State.StateInt := Global.PhIdle;
 ELSIF MixingPhase.State.Running THEN
@@ -151,7 +138,12 @@ doEnabled := diEnabled;
 ]]></ST>
     </Implementation>
     <LineIds Name="Mixing">
-      <LineId Id="566" Count="98" />
+      <LineId Id="568" Count="19" />
+      <LineId Id="727" Count="5" />
+      <LineId Id="588" Count="37" />
+      <LineId Id="733" Count="0" />
+      <LineId Id="626" Count="19" />
+      <LineId Id="734" Count="0" />
       <LineId Id="709" Count="1" />
       <LineId Id="665" Count="27" />
       <LineId Id="166" Count="0" />

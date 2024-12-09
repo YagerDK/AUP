@@ -18,9 +18,7 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
-// Nastavení PID parametrů
-pidParameters.fKp := 2.422; //10.0;
+      <ST><![CDATA[pidParameters.fKp := 2.422; //10.0;
 pidParameters.tTn := T#90S; //T#2S; //T#231.6S; -puvodni hodnota po navrhu
 pidParameters.tTv := T#0MS;//T#0.5S;
 pidParameters.tCtrlCycleTime := T#200MS;
@@ -28,7 +26,6 @@ pidParameters.tTaskCycleTime := T#100MS;
 pidParameters.fOutMaxLimit := 100.0;
 pidParameters.fOutMinLimit := 0.0;
 
-// PID regulátor
 ioHeatStruct.PID(
     fSetpointValue := ioHeatStruct.ParamHeatingSetPointAutomat,
     fActualValue := iWaterTemp,
@@ -40,12 +37,11 @@ ioHeatStruct.PID(
 
 ioHeatStruct.State.HeatingOut := ioHeatStruct.PID.fOut;
 
-// Řízení ohřívače
 oHeaterEnable := ioHeatStruct.State.EnableOut;
 oHeaterPower := ioHeatStruct.State.HeatingOut;
 
 {region "Manual/Automat"}
-// Přepínání mezi manuálním a automatickým režimem
+// switching state of engine - automatic or manual control (default state is manual)
 IF ioHeatStruct.Cmd.AutCtrl THEN
     ioHeatStruct.State.AutCtrl := TRUE;
     ioHeatStruct.State.ManCtrl := FALSE;
@@ -66,7 +62,8 @@ ioHeatStruct.Cmd.ManCtrl := FALSE;
 {endregion}
 
 {region "ManCtrl"}
-// Manuální režim - ruční ovládání ohřívače
+// processing manual actions - if command is processed, it is set to FALSE even if can't be processed
+// Engine commands are turn off (stop) and turn on (start)
 IF ioHeatStruct.State.ManCtrl THEN
     IF ioHeatStruct.Cmd.TurnOnMan THEN
         ioHeatStruct.State.EnableOut := TRUE;
@@ -83,7 +80,8 @@ END_IF;
 {endregion}
 
 {region "AutCtrl"}
-// Automatický režim - řízení ohřívače podle požadavku
+//if request to run in automatic mode set outputs to right states if MAR
+//AutoRequest shouldn't be reseted to false state
 IF ioHeatStruct.State.AutCtrl THEN
     ioHeatStruct.State.EnableOut := ioHeatStruct.Cmd.Req2RunAutCtrl;
 END_IF;
@@ -93,7 +91,7 @@ ioHeatStruct.Cmd.Req2RunAutCtrl := FALSE;
 {endregion}
 
 {region "Error states"}
-// Kontrola chyb - překročení maximální teploty
+// if water temperature is too high, stop heating and generate error
 IF iWaterTemp > Global.maxWaterTemp THEN
     ioHeatStruct.State.Err := TRUE;
     ioHeatStruct.State.GenErr := TRUE;
@@ -102,7 +100,6 @@ END_IF;
 {endregion}
 
 {region "StatusInt"}
-// Vizualizace stavů
 IF NOT ioHeatStruct.State.GenErr THEN
     IF ioHeatStruct.State.EnableOut THEN
         ioHeatStruct.State.StateInt := Global.Running;
@@ -116,7 +113,14 @@ END_IF;
 ]]></ST>
     </Implementation>
     <LineIds Name="Heater">
-      <LineId Id="772" Count="94" />
+      <LineId Id="774" Count="6" />
+      <LineId Id="782" Count="10" />
+      <LineId Id="794" Count="25" />
+      <LineId Id="882" Count="0" />
+      <LineId Id="820" Count="16" />
+      <LineId Id="883" Count="0" />
+      <LineId Id="837" Count="18" />
+      <LineId Id="857" Count="9" />
       <LineId Id="260" Count="0" />
     </LineIds>
   </POU>
