@@ -118,11 +118,15 @@ END_VAR
 {region "States"} 
     //Command valve in cases of states
    	IF DrainingPhase.State.Running THEN
+		DrainingValve.Cmd.OpenMan := TRUE;
+		DrainingValve.Cmd.CloseMan := FALSE;	 
 		DrainingValve.Cmd.Req2OpenAut := TRUE;
 		DrainingValve.Cmd.Req2CloseAut := FALSE;
 	END_IF;
 	
 	IF DrainingPhase.State.Idle OR DrainingPhase.State.Paused THEN
+		DrainingValve.Cmd.OpenMan := FALSE;
+		DrainingValve.Cmd.CloseMan := TRUE;
 		DrainingValve.Cmd.Req2CloseAut := TRUE;
 		DrainingValve.Cmd.Req2OpenAut := FALSE;
 	END_IF;
@@ -180,7 +184,11 @@ doEnabled := diEnabled;]]></ST>
       <LineId Id="253" Count="5" />
       <LineId Id="260" Count="2" />
       <LineId Id="112" Count="4" />
-      <LineId Id="272" Count="7" />
+      <LineId Id="272" Count="0" />
+      <LineId Id="314" Count="1" />
+      <LineId Id="273" Count="4" />
+      <LineId Id="316" Count="1" />
+      <LineId Id="278" Count="1" />
       <LineId Id="123" Count="1" />
       <LineId Id="126" Count="0" />
       <LineId Id="154" Count="11" />

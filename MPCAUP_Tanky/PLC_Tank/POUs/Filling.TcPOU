@@ -113,10 +113,14 @@ END_VAR]]></Declaration>
     //Command valve in cases of states
 	IF FillingPhase.State.Running THEN
 			//FillingValve.Cmd.AutCtrl := TRUE;
+			FillingValve.Cmd.OpenMan := TRUE;
+			FillingValve.Cmd.CloseMan := FALSE;	 
         	FillingValve.Cmd.Req2OpenAut := TRUE;
         	FillingValve.Cmd.Req2CloseAut := FALSE;
     END_IF;
     IF FillingPhase.State.Idle OR FillingPhase.State.Paused THEN
+			FillingValve.Cmd.OpenMan := FALSE;
+			FillingValve.Cmd.CloseMan := TRUE;	
         	FillingValve.Cmd.Req2CloseAut := TRUE;
         	FillingValve.Cmd.Req2OpenAut := FALSE;
     END_IF;
@@ -169,7 +173,12 @@ doEnabled := diEnabled;]]></ST>
       <LineId Id="821" Count="4" />
       <LineId Id="975" Count="0" />
       <LineId Id="998" Count="0" />
-      <LineId Id="976" Count="5" />
+      <LineId Id="1051" Count="0" />
+      <LineId Id="1053" Count="0" />
+      <LineId Id="1052" Count="0" />
+      <LineId Id="977" Count="2" />
+      <LineId Id="1054" Count="1" />
+      <LineId Id="980" Count="1" />
       <LineId Id="826" Count="18" />
       <LineId Id="9" Count="0" />
     </LineIds>

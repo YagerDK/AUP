@@ -1027,7 +1027,7 @@
                         </o>
                         <o>
                           <v n="Id">390574330L</v>
-                          <v n="Value">"StopAut"</v>
+                          <v n="Value">"StopMan"</v>
                         </o>
                         <o>
                           <v n="Id">2597686782L</v>
@@ -1035,7 +1035,7 @@
                         </o>
                         <o>
                           <v n="Id">823443203L</v>
-                          <v n="Value">"894"</v>
+                          <v n="Value">"968"</v>
                         </o>
                       </l>
                     </o>
@@ -1574,7 +1574,7 @@
                       <v>OnMouseClick</v>
                       <a cet="ToggleVarInputAction">
                         <o>
-                          <v n="ToggleVariable">"Global.Tank1.ValveDraining.Cmd.AutCtrl"</v>
+                          <v n="ToggleVariable">"Global.Tank1.Draining.Cmd.ResetDone"</v>
                           <n n="Error" />
                         </o>
                       </a>
