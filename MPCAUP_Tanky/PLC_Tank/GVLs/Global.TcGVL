@@ -36,6 +36,25 @@ VAR_GLOBAL
     totalCycleTime: INT; // Celkový čas všech cyklů
     cycleCount: INT := 0; // Počet dokončených cyklů
     avgCycleTime: INT := 0; // Průměrný čas cyklu
+	
+	FillingTime : INT := 0;         // Čas strávený v fázi Filling během aktuálního cyklu
+    HeatingTime : INT := 0;         // Čas strávený v fázi Heating během aktuálního cyklu
+    DrainingTime : INT := 0;        // Čas strávený v fázi Draining během aktuálního cyklu
+
+    // Pro celkový čas jednotlivých fází (součet času přes všechny cykly)
+    TotalFillingTime : INT := 0;    // Celkový čas strávený ve Filling
+    TotalHeatingTime : INT := 0;    // Celkový čas strávený v Heating
+    TotalDrainingTime : INT := 0;   // Celkový čas strávený v Draining
+	TotalMixingTime : INT := 0;     // Celkový čas strávený v Mixing
+	MixingTime : INT := 0;          // Čas strávený v fázi Mixing během aktuálního cyklu
+
+
+    // Pro průměrný čas jednotlivých fází (počítaný z Total*Time a počtu cyklů)
+    AvgFillingTime : INT := 0;      // Průměrný čas strávený ve Filling
+    AvgHeatingTime : INT := 0;      // Průměrný čas strávený v Heating
+    AvgDrainingTime : INT := 0;     // Průměrný čas strávený v Draining
+	AvgMixingTime : INT := 0;       // Průměrný čas strávený v Mixing
+
 
 END_VAR
 
