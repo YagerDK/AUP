@@ -18,9 +18,9 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[pidParameters.fKp := 2.422; //10.0;
-pidParameters.tTn := T#90S; //T#2S; //T#231.6S; -puvodni hodnota po navrhu
-pidParameters.tTv := T#0MS;//T#0.5S;
+      <ST><![CDATA[pidParameters.fKp := 1.25; //10.0;
+pidParameters.tTn := T#60S; //T#2S; //T#231.6S; -puvodni hodnota po navrhu
+pidParameters.tTv := T#0S;//T#0.5S;
 pidParameters.tCtrlCycleTime := T#200MS;
 pidParameters.tTaskCycleTime := T#100MS;
 pidParameters.fOutMaxLimit := 100.0;
