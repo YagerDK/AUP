@@ -111,6 +111,8 @@ CASE Current_state OF
 
         // Výpočet průměrných časů jednotlivých fází
         Global.cycleCount := Global.cycleCount + 1; // Zvýšíme počet cyklů
+		Global.totalCycleTime := Global.totalCycleTime + Global.secImpCounter; 
+		Global.avgCycleTime := (Global.totalCycleTime / Global.cycleCount);
         Global.AvgFillingTime := Global.TotalFillingTime / Global.cycleCount;
         Global.AvgHeatingTime := Global.TotalHeatingTime / Global.cycleCount;
         Global.AvgDrainingTime := Global.TotalDrainingTime / Global.cycleCount;
@@ -133,7 +135,10 @@ current_state := next_state;
       <LineId Id="1797" Count="4" />
       <LineId Id="1623" Count="59" />
       <LineId Id="1778" Count="11" />
-      <LineId Id="1695" Count="25" />
+      <LineId Id="1695" Count="10" />
+      <LineId Id="1803" Count="0" />
+      <LineId Id="1802" Count="0" />
+      <LineId Id="1706" Count="14" />
       <LineId Id="368" Count="0" />
     </LineIds>
   </POU>
