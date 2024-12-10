@@ -11,13 +11,18 @@ initialized : BOOL;
 
 hasCycled : BOOL := FALSE;
 waitTimer : TON; 
+
 	
+	secImpCounter: INT;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[
 // Generování časového impulsu
 Global.secImp := NOT(Global.secImp);
+IF Global.secImp THEN
+    Global.secImpCounter := Global.secImpCounter + 1; // Počítáme překlopení
+END_IF;
 
 CASE Current_state OF
     0: // Init
@@ -52,7 +57,13 @@ CASE Current_state OF
 
     2: // Filling
         // Přidání čekání, pokud cyklus již proběhl
-  
+		
+		 IF Global.secImpCounter = 0 THEN
+        	Global.secImpCounter := 0; // Reset počítadla impulsů
+   		 END_IF;
+		 
+		 
+		 
         Global.Tank1.Filling.Cmd.StartAut := TRUE; // Spuštění Filling fáze
         IF Global.Tank1.Filling.State.Done THEN
             Global.Tank1.Filling.Cmd.StartAut := FALSE; // Zastavení Filling
@@ -88,6 +99,15 @@ CASE Current_state OF
         Global.Tank1.Heating.Cmd.ResetDone := TRUE;
         Global.Tank1.Mixing.Cmd.ResetDone := TRUE;
         Global.Tank1.Draining.Cmd.ResetDone := TRUE;
+		
+		  // Výpočet času cyklu
+		Global.totalCycleTime := Global.totalCycleTime + Global.secImpCounter; // Přidáme čas aktuálního cyklu
+		Global.cycleCount := Global.cycleCount + 1; // Zvýšíme počet cyklů
+		Global.avgCycleTime := Global.totalCycleTime / Global.cycleCount; // Vypočítáme průměrný čas
+
+    	Global.secImpCounter := 0; // Reset počítadla impulsů
+		
+		
 		next_state := 6;
 		
 	6:
@@ -105,8 +125,16 @@ current_state := next_state;
 ]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
-      <LineId Id="1356" Count="36" />
+      <LineId Id="1356" Count="2" />
+      <LineId Id="1490" Count="1" />
+      <LineId Id="1359" Count="0" />
+      <LineId Id="1489" Count="0" />
+      <LineId Id="1360" Count="32" />
+      <LineId Id="1484" Count="0" />
+      <LineId Id="1492" Count="1" />
       <LineId Id="1398" Count="0" />
+      <LineId Id="1505" Count="1" />
+      <LineId Id="1495" Count="0" />
       <LineId Id="1401" Count="0" />
       <LineId Id="1404" Count="1" />
       <LineId Id="1471" Count="0" />
@@ -117,6 +145,9 @@ current_state := next_state;
       <LineId Id="1421" Count="4" />
       <LineId Id="1470" Count="0" />
       <LineId Id="1427" Count="8" />
+      <LineId Id="1504" Count="0" />
+      <LineId Id="1499" Count="4" />
+      <LineId Id="1496" Count="2" />
       <LineId Id="1456" Count="0" />
       <LineId Id="1454" Count="1" />
       <LineId Id="1457" Count="0" />

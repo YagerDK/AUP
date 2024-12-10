@@ -31,6 +31,11 @@ VAR_GLOBAL
 	
 	maxWaterTemp : REAL;
 	timeReqOnTemp : REAL;
+	
+ 	secImpCounter: INT := 0; // Počet impulsů v aktuálním cyklu
+    totalCycleTime: INT; // Celkový čas všech cyklů
+    cycleCount: INT := 0; // Počet dokončených cyklů
+    avgCycleTime: INT := 0; // Průměrný čas cyklu
 
 END_VAR
 
