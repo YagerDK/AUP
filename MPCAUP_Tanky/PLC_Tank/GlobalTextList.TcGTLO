@@ -36,6 +36,11 @@
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
+              <v n="TextID">"319"</v>
+              <v n="TextDefault">"Actual water level"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
               <v n="TextID">"406"</v>
               <v n="TextDefault">"AUT"</v>
               <l n="LanguageTexts" t="ArrayList" />
@@ -101,8 +106,23 @@
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
+              <v n="TextID">"326"</v>
+              <v n="TextDefault">"MAx. tank temperature"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
+              <v n="TextID">"521"</v>
+              <v n="TextDefault">"Max. tank temperature"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
               <v n="TextID">"181"</v>
               <v n="TextDefault">"minimum time on req. temp."</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
+              <v n="TextID">"524"</v>
+              <v n="TextDefault">"Minimum time on req. temp."</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
@@ -141,8 +161,23 @@
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
+              <v n="TextID">"212"</v>
+              <v n="TextDefault">"Required min. water level"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
               <v n="TextID">"747"</v>
               <v n="TextDefault">"required temp."</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
+              <v n="TextID">"94"</v>
+              <v n="TextDefault">"Required temperature"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
+              <v n="TextID">"702"</v>
+              <v n="TextDefault">"Required water level"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
@@ -178,6 +213,11 @@
             <o>
               <v n="TextID">"835"</v>
               <v n="TextDefault">"Start mixing"</v>
+              <l n="LanguageTexts" t="ArrayList" />
+            </o>
+            <o>
+              <v n="TextID">"188"</v>
+              <v n="TextDefault">"START PROCESS"</v>
               <l n="LanguageTexts" t="ArrayList" />
             </o>
             <o>
